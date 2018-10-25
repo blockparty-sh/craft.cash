@@ -1,0 +1,204 @@
+<!doctype html>
+<html>
+    <head>
+        <link rel="stylesheet" href="../dist/blockparty-wallet.css">
+        <style>
+        #blockparty-wallet {
+            position:absolute;
+            bottom:0px;
+            right:100px;
+            width:25rem;
+        }
+        </style>
+    </head>
+    <body>
+        <p>go to <a href="https://memo.cash/key/export">https://memo.cash/key/export</a> and grab your WIF Compressed (base58) to import to try this out</p>
+        <p id="current-name">loading current name...</p>
+        <input type="text" id="new-name" placeholder="change name">
+        <button type="button" id="new-name-btn">change</button>
+
+
+        <script type="text/template" id="memo-template">
+            <li class="action-memo">
+                <div class="collapsible-header valign-wrapper">
+                    <a class="btn-floating action-icon green"><i class="material-icons">speaker_notes</i></a>
+                    <span class="action-type">{{type}}</span>
+                    <span class="action-amount">{{amnt}} BCH</span>
+                    <span class="action-date right">{{date}}</span>
+                </div>
+                <div class="collapsible-body action-collapse">
+                    <span class="txid"><a href="{{txid_href}}" class="truncate" target="_blank">{{txid}}</a></span>
+                </div>
+            </li>
+        </script>
+
+
+        <script src="../dist/blockparty-wallet.js"></script>
+        <script>
+            const memo_template = blockparty.handlebars.compile(document.getElementById('memo-template').innerText);
+
+            // clear existing parser (we dont care about send/receives, just memo messages)
+            blockparty.registered_actions_parsers = [];
+            // create a new parser which will operate on the incoming transactions
+            // and generate items inside the "actions" tab in the wallet
+            blockparty.registered_actions_parsers.push((tx, confirmed) => {
+                const address = blockparty.get_address_str().split('bitcoincash:')[1];
+
+                let txid_str = tx.tx.h;
+                let txid_href = blockparty.tx_link_url_mapper(txid_str);
+                let date_string = '';
+                if (typeof tx.blk === 'undefined') {
+                    date_string = 'X/X/X';
+                } else {
+                    const date = new Date(tx.blk.t*1000);
+                    date_string = `${date.getMonth()}/${date.getDate()}/${1900+date.getYear()}`;
+                }
+
+                // memo stores txids in little endian 
+                const endian_conversion = (s) => s.match(/../g).reverse().join('');
+
+                let type = '';
+                for (const o of tx.out) {
+                    if (typeof o.h1 == 'undefined') {
+                        continue;
+                    }
+
+                    console.log(o);
+                    switch (o.h1) {
+                        case '6d01':
+                            type = 'set_name';
+                            txid_str = o.s2;
+                            console.log('set_name', o.s2);
+                            break;
+                        case '6d02':
+                            type = 'post_memo';
+                            txid_href = 'https://memo.cash/post/' + txid_str;
+                            txid_str = o.s2;
+                            console.log('post_memo', o.s2);
+                            break;
+                        case '6d04':
+                            type = 'like_memo';
+                            txid_href = 'https://memo.cash/post/' + endian_conversion(o.h2);
+                            txid_str = 'click to see post';
+                            console.log('like_memo', endian_conversion(o.h2));
+                            break;
+                        case '6d05':
+                            type = 'set_profile_text';
+                            txid_str = o.s2;
+                            console.log('set_profile_text', o.s2);
+                            break;
+                        case '6d06':
+                            type = 'follow_user';
+                            console.log('follow_user', endian_conversion(o.h2));
+                            break;
+                        case '6d07':
+                            type = 'unfollow_user';
+                            txid_href = 'https://memo.cash/profile/' + endian_conversion(o.h2);
+                            txid_str = 'click to see profile';
+                            console.log('unfollow_user', endian_conversion(o.h2));
+                            break;
+                        case '6d0a':
+                            type = 'set_profile_picture';
+                            console.log('set_profile_picture', o.s2);
+                            break;
+                        case '6d0c':
+                            type = 'post_topic_message';
+                            console.log('post_topic_message', o.s2, o.s3);
+                            break;
+                        case '6d0d':
+                            type = 'topic_follow';
+                            console.log('topic_follow', o.s2);
+                            break;
+                        case '6d0e':
+                            type = 'topic_unfollow';
+                            console.log('topic_unfollow', o.s2);
+                            break;
+                        case '6d10':
+                            type = 'create_poll';
+                            console.log('create_poll', o.s2, o.s3, o.s4);
+                            break;
+                        case '6d13':
+                            type = 'add_poll_option';
+                            console.log('add_poll_option', endian_conversion(o.h2), o.s3);
+                            break;
+                        case '6d24':
+                            type = 'send_money';
+                            console.log('send_money', o.s2);
+                            break;
+                        default:
+                            continue;
+                    }
+                }
+
+                if (type != '') {
+                    document
+                        .querySelector('#blockparty-wallet #actions .collapsible')
+                        .insertAdjacentHTML('beforeend', memo_template({
+                            'type':      type,
+                            'date':      date_string,
+                            'txid':      txid_str,
+                            'txid_href': txid_href
+                        }));
+                }
+            });
+
+            const get_current_name = () => {
+                blockparty.query_bitdb({
+                    "v": 3,
+                    "q": {
+                        "find": {
+                            "$or": [
+                                {"in.e.a":  blockparty.get_address_str().split('bitcoincash:')[1]}, // bitdb doesnt keep the 'bitcoincash:' prefix, so we strip it
+                                {"out.e.a": blockparty.get_address_str().split('bitcoincash:')[1]}
+                            ],
+                            "out.h1": "6d01"
+                        },
+                        "limit": 1
+                    }
+                }, (data) => {
+                    console.log(data);
+                    let username = '';
+                    if (data.c.length > 0) {
+                        username = data.c[0].out[0].s2;
+                    }
+                    if (data.u.length > 0) {
+                        username = data.u[0].out[0].s2;
+                    }
+                    document.getElementById('current-name').innerText = username;
+                });
+            };
+
+            // we place the setup calls above init so that when blockparty is initialized
+            // we dont get any surprises... this after call will usually work if we place 
+            // it after the init(), but we shouldn't assume it will. it wont.
+            blockparty.after('login', get_current_name);
+            blockparty.init({
+				'bitdb_token': 'qp9rzh6levrrn5r5x4slc6q7qxhl452dty5nuyuq6m',
+			});
+
+            // here we create the memo set_name transaction
+            document.getElementById('new-name-btn').addEventListener('click', () => {
+                let tx = new blockparty.bch.Transaction();
+                tx.from(blockparty.get_utxos());
+                tx = blockparty.add_op_return_data(tx, [
+                    {'type': 'hex', 'v': '6d01'}, // https://memo.cash/protocol
+                    {'type': 'str', 'v': document.getElementById('new-name').value},
+                ]);
+                tx.feePerKb(blockparty.fee_per_kb);
+                tx.change(blockparty.get_address());
+                tx = blockparty.clean_tx_dust(tx);
+                tx = tx.sign(blockparty.get_private_key());
+
+                blockparty.broadcast_tx(tx, () => {
+                    window.alert('name updated');
+                    setTimeout(() => {
+                        get_current_name()
+                        blockparty.update_balance(blockparty.update_balance_html);
+                        blockparty.update_utxos();
+                        blockparty.update_actions();
+                    }, 2000);
+                }, false);
+            });
+        </script>
+    </body>
+ </html>

@@ -1,0 +1,27 @@
+{
+  "name": "blockparty-wallet",
+  "version": "1.0.0",
+  "description": "",
+  "dependencies": {
+    "bip39": "^2.5.0",
+    "bitcore-explorers": "^1.0.1",
+    "bitcore-lib-cash": "^0.18.1",
+    "brfs": "^2.0.1",
+    "handlebars": "^4.0.12",
+    "materialize-css": "^1.0.0",
+    "qrcode-generator": "^1.4.1",
+    "satoshi-bitcoin": "^1.0.4",
+    "simplebar": "^3.0.0-beta.5"
+  },
+  "devDependencies": {
+    "browserify": "^16.2.3",
+    "browserify-css": "^0.14.0",
+    "eslint": "^5.7.0",
+    "eslint-config-google": "^0.11.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT"
+}

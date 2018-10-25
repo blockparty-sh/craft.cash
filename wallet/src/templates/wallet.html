@@ -1,0 +1,127 @@
+<div id="blockparty-wallet">
+    <div class="card hide" id="logged-in-card">
+        <div class="card-content white-text">
+            <i class="activator settings-btn material-icons">settings</i>
+            <h5 class="center-align" id="balance-amnt">loading...</h5>
+            <h6 class="center-align" id="unconfirmed-balance-amnt"></h6>
+        </div>
+        <div class="card-tabs">
+            <ul class="tabs tabs-fixed-width tabs-transparent">
+                <li class="tab"><a href="#actions" class="">Actions</a></li>
+                <li class="tab"><a href="#send" class="">Send</a></li>
+                <li class="tab"><a href="#receive" class="active">Receive</a></li>
+            </ul>
+        </div>
+        <div class="card-content card-fixed-height card-content-pane">
+            <div id="actions">
+                <ul class="collapsible">
+                </ul>
+            </div>
+            <div id="send">
+                <div class="input-field">
+                    <label for="send-address">Address</label>
+                    <input type="text" id="send-address" class="validate" data-error="Please enter a valid Bitcoin Cash address" placeholder="qzfshy25fwkn2jvr5vz0zymw2chk243ay57sht4t98" spellcheck="false">
+
+                </div>
+                <div class="input-field">
+                    <label for="send-amount">Amount</label>
+                    <input type="number" id="send-amount" value="0.00002" step="0.0001" min="0.000000001">
+                </div>
+
+                <div class="input-field">
+                    <div class="center">
+                        <button class="btn-large waves-effect waves-light" id="send-btn" disabled><span class="btn-text">Send</span>
+                            <i class="material-icons right">send</i>
+                        </button>
+                    </div>
+                </div>
+                <div class="clearfix">
+                </div>
+            </div>
+            <div id="receive">
+                <a href="#" class="truncate" id="receive-address-link" target="_blank"></a>
+                <div id="qrcode" class="responsive-img"></div>
+            </div>
+        </div>
+        <div class="card-reveal">
+            <span class="card-title card-reveal-header">Settings<i class="material-icons right">close</i></span>
+            <br>
+            <div class="center">
+                <button class="card-title btn-large waves-effect waves-light" id="logout-btn">Logout
+                    <i class="material-icons right">exit_to_app</i>
+                </button>
+            </div>
+            <div id="linkback">
+                <a href="https://blockparty.sh" target="_blank">blockparty wallet</a>
+            </div>
+        </div>
+        <div id="transaction-sent-pane" class="transaction-pane hidden-fade">
+            <h4 class="center">Sent</h4>
+            <div class="center transaction-action-icon">
+                <i class="material-icons">call_made</i>
+            </div>
+            <a class="center transaction-amount" id="sent-amount" target="_blank"></a>
+        </div>
+        <div id="transaction-received-pane" class="transaction-pane hidden-fade">
+            <h4 class="center">Received</h4>
+            <div class="center transaction-action-icon">
+                <i class="material-icons">call_received</i>
+            </div>
+            <a class="center transaction-amount" id="received-amount" target="_blank"></a>
+        </div>
+    </div>
+    <div class="card" id="logged-out-card">
+        <div class="card-content white-text">
+            <i class="activator settings-btn material-icons">help</i>
+            <h5 class="center-align">BlockParty Wallet</h5>
+        </div>
+        <div class="card-tabs">
+            <ul class="tabs tabs-fixed-width tabs-transparent">
+                <li class="tab"><a href="#generate" class="active">Generate</a></li>
+                <li class="tab"><a href="#import" class="">Import</a></li>
+            </ul>
+        </div>
+        <div class="card-content card-fixed-height card-content-pane">
+            <div id="actions">
+                <ul class="collapsible">
+                </ul>
+            </div>
+            <div id="generate">
+                <br>
+				<p class="center">Ensure you save these words and keep them safe, they are the key to your new wallet. Without them, your money will be lost forever.<br>Go to Import after saving.</p>
+				<br>
+                <div class="input-field">
+                    <textarea class="mnemonic center materialize-textarea" readonly>{{mnemonic}}</textarea>
+                </div>
+				<br>
+				<div class="center">
+					<button class="btn-large waves-effect waves-light" id="mnemonic-download-btn">Download
+						<i class="material-icons right">save_alt</i>
+					</button>
+				</div>
+            </div>
+            <div id="import">
+                <br>
+				<p class="center">Type the 12 word phrase you downloaded when generating the wallet.</p>
+				<br>
+                <div class="input-field">
+                    <textarea class="mnemonic center materialize-textarea" id="mnemonic-import-string"></textarea>
+                </div>
+                <p class="center">Or input the WIF</p>
+                <div class="input-field">
+                    <textarea class="mnemonic center materialize-textarea" id="wif-import-string"></textarea>
+                </div>
+				<br>
+				<div class="center">
+					<button class="btn-large waves-effect waves-light" id="import-btn">Import
+						<i class="material-icons right">cloud_upload</i>
+					</button>
+				</div>
+            </div>
+        </div>
+        <div class="card-reveal">
+            <span class="card-title card-reveal-header">Help<i class="material-icons right">close</i></span>
+            <p>is only revealed once clicked on.</p>
+        </div>
+    </div>
+</div>
