@@ -86,6 +86,8 @@ class World {
                     }
                 }
 
+                data_chunks = data_chunks.filter(x => typeof(x) === 'string');
+                console.log(data_chunks);
                 data_chunks = data_chunks
                     .map(x => x.match(/.{1,8}/g)
                         .map(y => y.match(/.{1,2}/g)
