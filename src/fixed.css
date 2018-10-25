@@ -1,0 +1,48 @@
+/* this is used to deal with prefix code correctly */ 
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import url('https://fonts.googleapis.com/css?family=Kodchasan');
+
+#blockparty-wallet {
+    line-height:1.15;
+    -ms-text-size-adjust:100%;
+    -webkit-text-size-adjust:100%;
+    transition:bottom 0.5s ease;
+}
+
+#blockparty-wallet button, #blockparty-wallet [type="button"], #blockparty-wallet [type="reset"], #blockparty-wallet [type="submit"]{
+    -webkit-appearance:button
+}
+#blockparty-wallet {
+    -webkit-box-sizing:border-box;
+    box-sizing:border-box;
+}
+#blockparty-wallet {
+    line-height:1.5;
+    font-family:'Kodchasan', -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+    font-weight:normal;
+    color:rgba(0,0,0,0.87);
+}
+.hiddendiv {
+    visibility:hidden;
+    white-space:pre-wrap;
+    word-wrap:break-word;
+    overflow-wrap:break-word;
+    padding-top:1.2rem;
+    position:absolute;
+    top:0;
+    z-index:-1;
+}
+#blockparty-wallet body.keyboard-focused .select-dropdown.dropdown-content li:focus {
+    background-color:rgba(0,0,0,0.08);
+}
+#blockparty-wallet.minimized {
+    bottom: -465px;
+    transition:bottom 0.5s ease;
+}
+#blockparty-wallet.minimized .settings-btn {
+    display:none;
+}
+
+#blockparty-wallet.minimized #balance-amnt {
+    margin-top: 0.3rem;
+}
