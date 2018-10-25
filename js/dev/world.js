@@ -60,10 +60,6 @@ class World {
                 "v": 3,
                 "q": {
                     "find": {
-                        "$or": [
-                            {"in.e.a":  blockparty.get_address_str().split('bitcoincash:')[1]}, // bitdb doesnt keep the 'bitcoincash:' prefix, so we strip it
-                            {"out.e.a": blockparty.get_address_str().split('bitcoincash:')[1]}
-                        ],
                         "out.s1": "craft",
                         "out.h2": game.tx_world,
 						"blk.i": {"$lte": game.tx_block},
