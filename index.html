@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+        <link rel="manifest" href="/site.webmanifest">
+        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+        <meta name="apple-mobile-web-app-title" content="craft.cash">
+        <meta name="application-name" content="craft.cash">
+        <meta name="msapplication-TileColor" content="#ffc40d">
+        <meta name="theme-color" content="#ffffff">
+        <title>craft.cash</title>
+  
+        <script src="js/libs/three.js"></script>
+        <script src="js/libs/Stats.js"></script>
+        <script src="js/libs/jquery-1.11.1.min.js"></script>
+        <script src="js/libs/perlin.js"></script>
+        <script src="js/libs/ImprovedNoise.js"></script>
+
+        <script src="js/libs/THREEx.KeyboardState.js"></script>
+        <script src="js/libs/THREEx.WindowResize.js"></script>
+
+        <script src="js/controls/PointerLockControls.js"></script>
+
+		<script src="js/shaders/DigitalGlitch.js"></script>
+		<script src="js/shaders/BleachBypassShader.js"></script>
+		<script src="js/shaders/ColorifyShader.js"></script>
+		<script src="js/shaders/ConvolutionShader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/DotScreenShader.js"></script>
+		<script src="js/shaders/FilmShader.js"></script>
+		<script src="js/shaders/HorizontalBlurShader.js"></script>
+		<script src="js/shaders/SepiaShader.js"></script>
+		<script src="js/shaders/VerticalBlurShader.js"></script>
+		<script src="js/shaders/VignetteShader.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
+		<script src="js/shaders/LuminosityHighPassShader.js"></script>
+
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/GlitchPass.js"></script>
+		<script src="js/postprocessing/BloomPass.js"></script>
+		<script src="js/postprocessing/FilmPass.js"></script>
+		<script src="js/postprocessing/DotScreenPass.js"></script>
+		<script src="js/postprocessing/TexturePass.js"></script>
+		<script src="js/postprocessing/UnrealBloomPass.js"></script>
+
+        <link rel="stylesheet" href="wallet/dist/blockparty-wallet.css">
+
+        <style>
+        html, body {
+            cusor: none;
+            background-color: #000000;
+            font-family:Monospace;
+            font-size:13px;
+            text-align:center;
+            font-weight: bold;
+            color:#fff;
+  
+            background-color: #000000;
+            margin: 0 auto;
+            overflow: hidden; 
+            height: 100%;
+            width: 100%;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        #instructions {
+            position: absolute;
+            z-index:100;
+            text-align:left;
+        }
+
+        #color-chooser {
+            position:absolute;
+            z-index:100;
+            bottom:0px;
+            left:0px;
+            width:100vw;
+            background-color: rgba(255, 255, 255, 0.1);
+            display:none;
+        }
+        .color-choice {
+            width: calc(100vw / 64);
+            height: calc(100vw / 64);
+            float:left;
+            margin:calc(100vw/512);
+            padding:0;
+            border:0;
+            border-radius:100%;
+        }
+        .color-choice.selected {
+            box-shadow: 0px 0px calc(100vw / 256) calc(100vw / 512) rgba(255, 255, 255, 0.7);
+        }
+        #selected-color {
+            position:absolute;
+            z-index:100;
+			bottom: calc(100vw/128);
+		    left: calc(100vw/128);
+		    height: calc(100vw/32);
+		    width: calc(100vw/32);
+            background-color:#000;
+			animation: pulse 2s infinite;
+			border-radius:100%;
+			border:1px solid #222;
+        }
+		#loading-status {
+			position:absolute;
+			z-index:100;
+			top:30vw;
+			left:0;
+			width:100vw;
+			background-color:rgba(12, 118, 228, 0.7);
+			color:#fff;
+			font-size:6vw;
+			text-align:center;
+			padding:2vw;
+		}
+
+        #footer {
+			position: absolute;
+			z-index: 99;
+			bottom: 0px;
+			left: 0;
+			width: 100%;
+			color: #fff;
+			background-color: #363636;
+			padding:0.4rem;
+        }
+
+		#footer a {
+			color: #fff;
+		}
+
+		@-webkit-keyframes pulse {
+		  0% {
+			-webkit-box-shadow: 0 0 0 0 rgba(70,238,101, 0.9);
+		  }
+		  70% {
+			  -webkit-box-shadow: 0 0 0 calc(100vw/128) rgba(70,238,101, 0);
+		  }
+		  100% {
+			  -webkit-box-shadow: 0 0 0 0 rgba(70,238,101, 0);
+		  }
+		}
+		@keyframes pulse {
+		  0% {
+			-moz-box-shadow: 0 0 0 0 rgba(70,238,101, 0.9);
+			box-shadow: 0 0 0 0 rgba(70,238,101, 0.9);
+		  }
+		  70% {
+			  -moz-box-shadow: 0 0 0 calc(100vw/128) rgba(70,238,101, 0);
+			  box-shadow: 0 0 0 calc(100vw/128) rgba(70,238,101, 0);
+		  }
+		  100% {
+			  -moz-box-shadow: 0 0 0 0 rgba(70,238,101, 0);
+			  box-shadow: 0 0 0 0 rgba(70,238,101, 0);
+		  }
+		}
+
+		#blockparty-wallet {
+            position:absolute;
+            bottom:-13px;
+            right:0px;
+            width:25rem;
+			z-index:1000;
+        }
+        .action-icon {
+            background-image: url(/apple-touch-icon.png);
+            background-size: cover;
+        }
+
+		.action-world {
+      		padding-left:1.5rem;
+	      	font-size:0.9rem;
+	  	}
+
+        .action-blocks {
+            padding:0.5rem;
+            position:absolute;
+            left:12rem;
+            font-size:0.9rem;
+            font-weight:100;
+        } 
+        </style>
+    </head>
+    <body oncontextmenu="return false;">
+        <div id="instructions">
+            wasd + qe to move<br>
+            c to select color<br>
+            lmb to place, rmb to erase<br>
+            z to sync changes
+        </div>
+        <div style="position: relative; z-index: 1; " id="container"></div> 
+        <div style="position: absolute; z-index: 100;" id="stats"></div>
+		<div id="loading-status"></div>
+        <div id="color-chooser"></div>
+        <div id="selected-color"></div>
+        <div id="footer">
+            <a href="https://github.com/blockparty-sh/craft.cash">git link</a>
+        </div>
+
+        <script type="text/template" id="craft-action-template">
+            <li class="action-craft">
+                <div class="collapsible-header valign-wrapper">
+                    <a class="btn-floating action-icon"></a>
+                    <span class="action-world">#{{world}}</span>
+                    <span class="action-blocks">{{blocks}} blocks</span>
+                    <span class="action-date right">{{date}}</span>
+                </div>
+                <div class="collapsible-body action-collapse">
+                    <span class="txid"><a href="{{txid_href}}" class="truncate" target="_blank">{{txid}}</a></span>
+					<br>
+                    <span class="see-on-craft-cast"><a href="{{craft_href}}" class="truncate" target="_blank">view on craft.cash</a></span>
+                </div>
+            </li>
+        </script>
+        <script src="wallet/dist/blockparty-wallet.js"></script>
+        <script src="js/dev/world.js"></script>
+        <script src="js/dev/main.js"></script>
+        <script>
+            let game = null;
+
+            const craft_action_template = blockparty.handlebars.compile(document.getElementById('craft-action-template').innerText);
+
+            blockparty.registered_actions_parsers = [];
+			// todo -- collect multiple transactions to a single link
+			// so we dont have 51 blocks showing for 10 times in a row :)
+            blockparty.registered_actions_parsers.push((tx, confirmed) => {
+                const address = blockparty.get_address_str().split('bitcoincash:')[1];
+                const txid_str = tx.tx.h;
+                const txid_href = blockparty.tx_link_url_mapper(txid_str);
+
+                let date_string = '';
+                if (typeof tx.blk === 'undefined') {
+                    date_string = 'X/X/X';
+                } else {
+                    const date = new Date(tx.blk.t*1000);
+                    date_string = `${date.getMonth()}/${date.getDate()}/${1900+date.getYear()}`;
+                }
+
+                let world = '';
+                let blocks = 0;
+                for (const o of tx.out) {
+                    if (o.s1 != 'craft') {
+                        continue;
+                    }
+
+                    world = o.h2;
+                    blocks = o.h3.length / 8;
+					break;
+                }
+
+                if (world != '') {
+					let craft_href = `https://craft.cash?world=${world}`;
+					if (typeof tx.blk !== 'undefined') {
+						craft_href += `&block=${tx.blk.i}`;
+					}
+
+                    document
+                        .querySelector('#blockparty-wallet #actions .collapsible')
+                        .insertAdjacentHTML('beforeend', craft_action_template({
+                            'world':      world,
+                            'blocks':     blocks,
+                            'date':       date_string,
+                            'txid':       txid_str,
+                            'txid_href':  txid_href,
+                            'craft_href': craft_href,
+                        }));
+                }
+            });
+
+			const get_url_vars = () => {
+				let ret = {};
+				const parts = window.location.href.replace(
+					/[?&]+([^=&]+)=([^&]*)/gi,
+					(m, key, value) => { ret[key] = value; }
+				);
+
+				return ret;
+			};
+
+			const get_url_param = (param, default_v) => {
+				let ret = default_v;
+
+				if (window.location.href.indexOf(param) > -1) {
+					ret = get_url_vars()[param];
+				}
+
+				return ret;
+			};
+
+
+            blockparty.init({
+                'bitdb_token': 'qp9rzh6levrrn5r5x4slc6q7qxhl452dty5nuyuq6m',
+                'fee_per_kb': 500,
+            });
+            blockparty.after('login', () => {
+                game = new Game(
+					get_url_param('world', '00000000')
+						.replace(/[^0-9a-fA-F]/, '')
+						.padStart(8, '0')
+						.substring(0, 8),
+					get_url_param('block', 100000000)|0
+				);
+                game.init();
+            });
+        </script>
+    </body>
+</html>
