@@ -234,89 +234,91 @@
         <script>
             let game = null;
 
-            const craft_action_template = blockparty.handlebars.compile(document.getElementById('craft-action-template').innerText);
+            $(document).ready(() => {
+                const craft_action_template = blockparty.handlebars.compile(document.getElementById('craft-action-template').innerText);
 
-            blockparty.registered_actions_parsers = [];
-			// todo -- collect multiple transactions to a single link
-			// so we dont have 51 blocks showing for 10 times in a row :)
-            blockparty.registered_actions_parsers.push((tx, confirmed) => {
-                const address = blockparty.get_address_str().split('bitcoincash:')[1];
-                const txid_str = tx.tx.h;
-                const txid_href = blockparty.tx_link_url_mapper(txid_str);
+                blockparty.registered_actions_parsers = [];
+                // todo -- collect multiple transactions to a single link
+                // so we dont have 51 blocks showing for 10 times in a row :)
+                blockparty.registered_actions_parsers.push((tx, confirmed) => {
+                    const address = blockparty.get_address_str().split('bitcoincash:')[1];
+                    const txid_str = tx.tx.h;
+                    const txid_href = blockparty.tx_link_url_mapper(txid_str);
 
-                let date_string = '';
-                if (typeof tx.blk === 'undefined') {
-                    date_string = 'X/X/X';
-                } else {
-                    const date = new Date(tx.blk.t*1000);
-                    date_string = `${date.getMonth()}/${date.getDate()}/${1900+date.getYear()}`;
-                }
-
-                let world = '';
-                let blocks = 0;
-                for (const o of tx.out) {
-                    if (o.s1 != 'craft') {
-                        continue;
+                    let date_string = '';
+                    if (typeof tx.blk === 'undefined') {
+                        date_string = 'X/X/X';
+                    } else {
+                        const date = new Date(tx.blk.t*1000);
+                        date_string = `${date.getMonth()}/${date.getDate()}/${1900+date.getYear()}`;
                     }
 
-                    world = o.h2;
-                    blocks = o.h3.length / 8;
-					break;
-                }
+                    let world = '';
+                    let blocks = 0;
+                    for (const o of tx.out) {
+                        if (o.s1 != 'craft') {
+                            continue;
+                        }
 
-                if (world != '') {
-					let craft_href = `https://craft.cash?world=${world}`;
-					if (typeof tx.blk !== 'undefined') {
-						craft_href += `&block=${tx.blk.i}`;
-					}
+                        world = o.h2;
+                        blocks = o.h3.length / 8;
+                        break;
+                    }
 
-                    document
-                        .querySelector('#blockparty-wallet #actions .collapsible')
-                        .insertAdjacentHTML('beforeend', craft_action_template({
-                            'world':      world,
-                            'blocks':     blocks,
-                            'date':       date_string,
-                            'txid':       txid_str,
-                            'txid_href':  txid_href,
-                            'craft_href': craft_href,
-                        }));
-                }
-            });
+                    if (world != '') {
+                        let craft_href = `https://craft.cash?world=${world}`;
+                        if (typeof tx.blk !== 'undefined') {
+                            craft_href += `&block=${tx.blk.i}`;
+                        }
 
-			const get_url_vars = () => {
-				let ret = {};
-				const parts = window.location.href.replace(
-					/[?&]+([^=&]+)=([^&]*)/gi,
-					(m, key, value) => { ret[key] = value; }
-				);
+                        document
+                            .querySelector('#blockparty-wallet #actions .collapsible')
+                            .insertAdjacentHTML('beforeend', craft_action_template({
+                                'world':      world,
+                                'blocks':     blocks,
+                                'date':       date_string,
+                                'txid':       txid_str,
+                                'txid_href':  txid_href,
+                                'craft_href': craft_href,
+                            }));
+                    }
+                });
 
-				return ret;
-			};
+                const get_url_vars = () => {
+                    let ret = {};
+                    const parts = window.location.href.replace(
+                        /[?&]+([^=&]+)=([^&]*)/gi,
+                        (m, key, value) => { ret[key] = value; }
+                    );
 
-			const get_url_param = (param, default_v) => {
-				let ret = default_v;
+                    return ret;
+                };
 
-				if (window.location.href.indexOf(param) > -1) {
-					ret = get_url_vars()[param];
-				}
+                const get_url_param = (param, default_v) => {
+                    let ret = default_v;
 
-				return ret;
-			};
+                    if (window.location.href.indexOf(param) > -1) {
+                        ret = get_url_vars()[param];
+                    }
+
+                    return ret;
+                };
 
 
-            blockparty.init({
-                'bitdb_token': 'qp9rzh6levrrn5r5x4slc6q7qxhl452dty5nuyuq6m',
-                'fee_per_kb': 500,
-            });
-            blockparty.after('login', () => {
-                game = new Game(
-					get_url_param('world', '00000000')
-						.replace(/[^0-9a-fA-F]/, '')
-						.padStart(8, '0')
-						.substring(0, 8),
-					get_url_param('block', 100000000)|0
-				);
-                game.init();
+                blockparty.init({
+                    'bitdb_token': 'qp9rzh6levrrn5r5x4slc6q7qxhl452dty5nuyuq6m',
+                    'fee_per_kb': 500,
+                });
+                blockparty.after('login', () => {
+                    game = new Game(
+                        get_url_param('world', '00000000')
+                            .replace(/[^0-9a-fA-F]/, '')
+                            .padStart(8, '0')
+                            .substring(0, 8),
+                        get_url_param('block', 100000000)|0
+                    );
+                    game.init();
+                });
             });
         </script>
     </body>
