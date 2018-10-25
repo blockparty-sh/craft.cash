@@ -174,3 +174,7 @@
     position:absolute;
     bottom:0px;
 }
+#revision {
+    font-size: 0.7rem;
+    margin:0;
+}

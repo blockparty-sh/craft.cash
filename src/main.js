@@ -12,6 +12,8 @@ const sb         = require('satoshi-bitcoin');
 const app = {};
 app.bch = bch;
 app.handlebars = Handlebars;
+app.revision = fs.readFileSync(__dirname + '/../.git/refs/heads/master', 'utf-8');
+
 
 app.append_to   = 'body'; // which element to append the wallet to
 app.bitdb_token = '';     // enter token from https://bitdb.network/v3/dashboard
@@ -79,6 +81,7 @@ app.init = (options = {}) => {
         .insertAdjacentHTML('beforeend', app.wallet_template({
             'address':  new_address.address,
             'mnemonic': new_address.mnemonic,
+            'revision': app.revision,
         }));
 
     // set up libraries (materialize and scrollbar)
@@ -86,7 +89,6 @@ app.init = (options = {}) => {
     for (const el of document.querySelectorAll('#blockparty-wallet .card-fixed-height')) {
         new SimpleBar(el);
     }
-
 
 
     // query elements
