@@ -27,31 +27,31 @@
 
         <script src="js/controls/PointerLockControls.js"></script>
 
-		<script src="js/shaders/DigitalGlitch.js"></script>
-		<script src="js/shaders/BleachBypassShader.js"></script>
-		<script src="js/shaders/ColorifyShader.js"></script>
-		<script src="js/shaders/ConvolutionShader.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/DotScreenShader.js"></script>
-		<script src="js/shaders/FilmShader.js"></script>
-		<script src="js/shaders/HorizontalBlurShader.js"></script>
-		<script src="js/shaders/SepiaShader.js"></script>
-		<script src="js/shaders/VerticalBlurShader.js"></script>
-		<script src="js/shaders/VignetteShader.js"></script>
-		<script src="js/shaders/FXAAShader.js"></script>
-		<script src="js/shaders/LuminosityHighPassShader.js"></script>
+        <script src="js/shaders/DigitalGlitch.js"></script>
+        <script src="js/shaders/BleachBypassShader.js"></script>
+        <script src="js/shaders/ColorifyShader.js"></script>
+        <script src="js/shaders/ConvolutionShader.js"></script>
+        <script src="js/shaders/CopyShader.js"></script>
+        <script src="js/shaders/DotScreenShader.js"></script>
+        <script src="js/shaders/FilmShader.js"></script>
+        <script src="js/shaders/HorizontalBlurShader.js"></script>
+        <script src="js/shaders/SepiaShader.js"></script>
+        <script src="js/shaders/VerticalBlurShader.js"></script>
+        <script src="js/shaders/VignetteShader.js"></script>
+        <script src="js/shaders/FXAAShader.js"></script>
+        <script src="js/shaders/LuminosityHighPassShader.js"></script>
 
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/GlitchPass.js"></script>
-		<script src="js/postprocessing/BloomPass.js"></script>
-		<script src="js/postprocessing/FilmPass.js"></script>
-		<script src="js/postprocessing/DotScreenPass.js"></script>
-		<script src="js/postprocessing/TexturePass.js"></script>
-		<script src="js/postprocessing/UnrealBloomPass.js"></script>
+        <script src="js/postprocessing/EffectComposer.js"></script>
+        <script src="js/postprocessing/RenderPass.js"></script>
+        <script src="js/postprocessing/MaskPass.js"></script>
+        <script src="js/postprocessing/ShaderPass.js"></script>
+        <script src="js/postprocessing/GlitchPass.js"></script>
+        <script src="js/postprocessing/BloomPass.js"></script>
+        <script src="js/postprocessing/FilmPass.js"></script>
+        <script src="js/postprocessing/DotScreenPass.js"></script>
+        <script src="js/postprocessing/TexturePass.js"></script>
+        <script src="js/postprocessing/UnrealBloomPass.js"></script>
 
         <link rel="stylesheet" href="wallet/dist/blockparty-wallet.css">
 
@@ -108,85 +108,85 @@
         #selected-color {
             position:absolute;
             z-index:100;
-			bottom: calc(100vw/128);
-		    left: calc(100vw/128);
-		    height: calc(100vw/32);
-		    width: calc(100vw/32);
+            bottom: calc(100vw/128);
+            left: calc(100vw/128);
+            height: calc(100vw/32);
+            width: calc(100vw/32);
             background-color:#000;
-			animation: pulse 2s infinite;
-			border-radius:100%;
-			border:1px solid #222;
+            animation: pulse 2s infinite;
+            border-radius:100%;
+            border:1px solid #222;
         }
-		#loading-status {
-			position:absolute;
-			z-index:100;
-			top:30vw;
-			left:0;
-			width:100vw;
-			background-color:rgba(12, 118, 228, 0.7);
-			color:#fff;
-			font-size:6vw;
-			text-align:center;
-			padding:2vw;
-		}
+        #loading-status {
+            position:absolute;
+            z-index:100;
+            top:30vw;
+            left:0;
+            width:100vw;
+            background-color:rgba(12, 118, 228, 0.7);
+            color:#fff;
+            font-size:6vw;
+            text-align:center;
+            padding:2vw;
+        }
 
         #footer {
-			position: absolute;
-			z-index: 99;
-			bottom: 0px;
-			left: 0;
-			width: 100%;
-			color: #fff;
-			background-color: #363636;
-			padding:0.4rem;
+            position: absolute;
+            z-index: 99;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            color: #fff;
+            background-color: #363636;
+            padding:0.4rem;
         }
 
-		#footer a {
-			color: #fff;
-		}
+        #footer a {
+            color: #fff;
+        }
 
-		@-webkit-keyframes pulse {
-		  0% {
-			-webkit-box-shadow: 0 0 0 0 rgba(70,238,101, 0.9);
-		  }
-		  70% {
-			  -webkit-box-shadow: 0 0 0 calc(100vw/128) rgba(70,238,101, 0);
-		  }
-		  100% {
-			  -webkit-box-shadow: 0 0 0 0 rgba(70,238,101, 0);
-		  }
-		}
-		@keyframes pulse {
-		  0% {
-			-moz-box-shadow: 0 0 0 0 rgba(70,238,101, 0.9);
-			box-shadow: 0 0 0 0 rgba(70,238,101, 0.9);
-		  }
-		  70% {
-			  -moz-box-shadow: 0 0 0 calc(100vw/128) rgba(70,238,101, 0);
-			  box-shadow: 0 0 0 calc(100vw/128) rgba(70,238,101, 0);
-		  }
-		  100% {
-			  -moz-box-shadow: 0 0 0 0 rgba(70,238,101, 0);
-			  box-shadow: 0 0 0 0 rgba(70,238,101, 0);
-		  }
-		}
+        @-webkit-keyframes pulse {
+          0% {
+            -webkit-box-shadow: 0 0 0 0 rgba(70,238,101, 0.9);
+          }
+          70% {
+              -webkit-box-shadow: 0 0 0 calc(100vw/128) rgba(70,238,101, 0);
+          }
+          100% {
+              -webkit-box-shadow: 0 0 0 0 rgba(70,238,101, 0);
+          }
+        }
+        @keyframes pulse {
+          0% {
+            -moz-box-shadow: 0 0 0 0 rgba(70,238,101, 0.9);
+            box-shadow: 0 0 0 0 rgba(70,238,101, 0.9);
+          }
+          70% {
+              -moz-box-shadow: 0 0 0 calc(100vw/128) rgba(70,238,101, 0);
+              box-shadow: 0 0 0 calc(100vw/128) rgba(70,238,101, 0);
+          }
+          100% {
+              -moz-box-shadow: 0 0 0 0 rgba(70,238,101, 0);
+              box-shadow: 0 0 0 0 rgba(70,238,101, 0);
+          }
+        }
 
-		#blockparty-wallet {
+        #blockparty-wallet {
             position:absolute;
             bottom:-13px;
             right:0px;
             width:25rem;
-			z-index:1000;
+            z-index:1000;
         }
         .action-icon {
             background-image: url(/apple-touch-icon.png);
             background-size: cover;
         }
 
-		.action-world {
-      		padding-left:1.5rem;
-	      	font-size:0.9rem;
-	  	}
+        .action-world {
+              padding-left:1.5rem;
+              font-size:0.9rem;
+          }
 
         .action-blocks {
             padding:0.5rem;
@@ -206,7 +206,7 @@
         </div>
         <div style="position: relative; z-index: 1; " id="container"></div> 
         <div style="position: absolute; z-index: 100;" id="stats"></div>
-		<div id="loading-status"></div>
+        <div id="loading-status"></div>
         <div id="color-chooser"></div>
         <div id="selected-color"></div>
         <div id="footer">
@@ -223,7 +223,7 @@
                 </div>
                 <div class="collapsible-body action-collapse">
                     <span class="txid"><a href="{{txid_href}}" class="truncate" target="_blank">{{txid}}</a></span>
-					<br>
+                    <br>
                     <span class="see-on-craft-cast"><a href="{{craft_href}}" class="truncate" target="_blank">view on craft.cash</a></span>
                 </div>
             </li>
@@ -241,6 +241,10 @@
                 // todo -- collect multiple transactions to a single link
                 // so we dont have 51 blocks showing for 10 times in a row :)
                 blockparty.registered_actions_parsers.push((tx, confirmed) => {
+                    document
+                        .querySelector('#blockparty-wallet #actions .collapsible')
+                        .innerHTML = '';
+
                     const address = blockparty.get_address_str().split('bitcoincash:')[1];
                     const txid_str = tx.tx.h;
                     const txid_href = blockparty.tx_link_url_mapper(txid_str);
@@ -327,10 +331,6 @@
                     get_url_param('block', 100000000)|0
                 );
                 game.init();
-
-
-                blockparty.after('login', () => {
-                });
             });
         </script>
     </body>

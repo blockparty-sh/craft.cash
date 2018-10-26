@@ -6,8 +6,8 @@
 
 class Game {
     constructor(tx_world, tx_block) {
-		this.tx_world = tx_world;
-		this.tx_block = tx_block;
+        this.tx_world = tx_world;
+        this.tx_block = tx_block;
 
         this.container;
         this.scene;
@@ -18,10 +18,10 @@ class Game {
         this.controls;
         this.selector;
         this.raycaster;
-		this.composer;
+        this.composer;
         this.mouse;
         this.block_buffer = new Map(); // what we'll serialize and send
-		this.syncing = false; // currently syncing? dont place blocks 
+        this.syncing = false; // currently syncing? dont place blocks 
         this.selected_color = 0;
 
         // Scene settings
@@ -84,59 +84,59 @@ class Game {
             return;
         }
 
-		console.log('sync');
-		this.syncing = true;
-		$('#loading-status').show();
-		$('#loading-status').text(`syncing (${game.block_buffer.size} remaining)`);
+        console.log('sync');
+        this.syncing = true;
+        $('#loading-status').show();
+        $('#loading-status').text(`syncing (${game.block_buffer.size} remaining)`);
 
-		let serialized_block_buf = "";
+        let serialized_block_buf = "";
 
-		let block_keys = [];
-		for(const m of game.block_buffer.entries()) {
-			const p = game.world.pos_to_xyz(m[0])
+        let block_keys = [];
+        for(const m of game.block_buffer.entries()) {
+            const p = game.world.pos_to_xyz(m[0])
 
             serialized_block_buf += (p.x).toString(16).padStart(2, '0');
             serialized_block_buf += (p.y).toString(16).padStart(2, '0');
             serialized_block_buf += (p.z).toString(16).padStart(2, '0');
             serialized_block_buf += (m[1] & 0xFF).toString(16).padStart(2, '0');
-			block_keys.push(m[0]);
+            block_keys.push(m[0]);
 
-			if (block_keys.length == 51) break; // can only store this much in op_return
-		}
+            if (block_keys.length == 51) break; // can only store this much in op_return
+        }
 
-		for (const i of block_keys) {
-			game.block_buffer.delete(i);
-		} 
+        for (const i of block_keys) {
+            game.block_buffer.delete(i);
+        } 
 
 
-		let tx = new blockparty.bch.Transaction();
-		tx.from(blockparty.get_utxos());
-		tx = blockparty.add_op_return_data(tx, [
-			{'type': 'str', 'v': 'craft'}, // prefix: 1+1+5 = 7
-			{'type': 'hex', 'v': this.tx_world}, // world: 1+1+4 = 6
-			{'type': 'hex', 'v': serialized_block_buf}, // data-- 7+6+1 = 14... 220-14=206 bytes remain
-		]);
-		tx.feePerKb(blockparty.fee_per_kb);
-		tx.change(blockparty.get_address());
-		tx = blockparty.clean_tx_dust(tx);
-		tx = tx.sign(blockparty.get_private_key());
-		console.log(tx);
+        let tx = new blockparty.bch.Transaction();
+        tx.from(blockparty.get_utxos());
+        tx = blockparty.add_op_return_data(tx, [
+            {'type': 'str', 'v': 'craft'}, // prefix: 1+1+5 = 7
+            {'type': 'hex', 'v': this.tx_world}, // world: 1+1+4 = 6
+            {'type': 'hex', 'v': serialized_block_buf}, // data-- 7+6+1 = 14... 220-14=206 bytes remain
+        ]);
+        tx.feePerKb(blockparty.fee_per_kb);
+        tx.change(blockparty.get_address());
+        tx = blockparty.clean_tx_dust(tx);
+        tx = tx.sign(blockparty.get_private_key());
+        console.log(tx);
 
         let that = this;
-		blockparty.broadcast_tx(tx, () => {
-			setTimeout(() => {
-				blockparty.update_balance(blockparty.update_balance_html);
-				blockparty.update_utxos(() => {
-					if (game.block_buffer.size > 0) {
-						game.sync_changes();
-					} else {
-						that.syncing = false;
-						$('#loading-status').hide();
-					}
-				});
-				blockparty.update_actions();
-			}, 2000);
-		}, false);
+        blockparty.broadcast_tx(tx, () => {
+            setTimeout(() => {
+                blockparty.update_balance(blockparty.update_balance_html);
+                blockparty.update_utxos(() => {
+                    if (game.block_buffer.size > 0) {
+                        game.sync_changes();
+                    } else {
+                        that.syncing = false;
+                        $('#loading-status').hide();
+                    }
+                });
+                blockparty.update_actions();
+            }, 2000);
+        }, false);
     }
 
     init_color_chooser() {
@@ -144,7 +144,7 @@ class Game {
         for (let i=1; i<256; ++i) {
             let color = this.world.byte_to_rgb(i);
             let html_color = "rgb(" + color.r + "," + color.g + ", " + color.b + ")";
-			
+            
             $('<div/>', {
                 'class': 'color-choice',
                 'data-colorid': i,
@@ -163,7 +163,7 @@ class Game {
 
             $('#color-chooser').hide();
             $('#selected-color').css('background-color', html_color);
-			$('#selected-color').css('animation', 'none');
+            $('#selected-color').css('animation', 'none');
             $('#selected-color').show();
         });
 
@@ -194,19 +194,19 @@ class Game {
     }
 
     init_keyboard_and_mouse() {
-		let that = this;
-		$(window).on('keydown', function(e) {
-			switch(e.key) {
+        let that = this;
+        $(window).on('keydown', function(e) {
+            switch(e.key) {
                 case 'w': that.keys_pressed |= that.key_w; break;
                 case 'a': that.keys_pressed |= that.key_a; break;
                 case 's': that.keys_pressed |= that.key_s; break;
                 case 'd': that.keys_pressed |= that.key_d; break;
                 case 'q': that.keys_pressed |= that.key_q; break;
                 case 'e': that.keys_pressed |= that.key_e; break;
-			}
-		});
-		$(window).on('keyup',(e) => {
-			switch(e.key) {
+            }
+        });
+        $(window).on('keyup',(e) => {
+            switch(e.key) {
                 case 'w': that.keys_pressed ^= that.key_w; break;
                 case 'a': that.keys_pressed ^= that.key_a; break;
                 case 's': that.keys_pressed ^= that.key_s; break;
@@ -215,8 +215,24 @@ class Game {
                 case 'e': that.keys_pressed ^= that.key_e; break;
                 case 'c': this.show_color_chooser(); break;
                 case 'z': this.sync_changes(); break;
-			}
-		});
+            }
+
+            const ms = 0.1;
+            switch(e.key) {
+                case 'i': this.controls.getObject().translateZ(-ms); break;
+                case 'k': this.controls.getObject().translateZ(ms); break;
+                case 'j': this.controls.getObject().translateX(-ms); break;
+                case 'l': this.controls.getObject().translateX(ms); break;
+                case 'u': this.controls.getObject().translateY(ms); break;
+                case 'o': {
+                    if(this.controls.getObject().position.y > 1) {
+                        this.controls.getObject().translateY(-ms);
+                    }
+                    break;
+                }
+            }
+
+        });
 
         this.mouse = {};
 
@@ -249,15 +265,15 @@ class Game {
                 that.mouse.right = false;
             }
         });
-	}
+    }
 
     init_shaders() {
-		this.composer = new THREE.EffectComposer(this.renderer);
-		this.composer.addPass(new THREE.RenderPass(this.scene, this.camera));
+        this.composer = new THREE.EffectComposer(this.renderer);
+        this.composer.addPass(new THREE.RenderPass(this.scene, this.camera));
 
 /*
-		let glitchPass = new THREE.GlitchPass();
-		glitchPass.renderToScreen = true;
+        let glitchPass = new THREE.GlitchPass();
+        glitchPass.renderToScreen = true;
 
         var effectVignette = new THREE.ShaderPass(THREE.VignetteShader);
         effectVignette.uniforms[ "offset" ].value = 0.05;
@@ -277,7 +293,7 @@ class Game {
         this.composer.addPass(new THREE.ClearMaskPass);
         // this.composer.addPass(effectVignette);
         this.composer.addPass(bloomPass);
-		// this.composer.addPass(glitchPass);
+        // this.composer.addPass(glitchPass);
 
         this.renderer.gammaInput = true;
         this.renderer.gammaOutput = true;
@@ -320,11 +336,11 @@ class Game {
     }
 
     init_controls() {
-		this.controls = new THREE.PointerLockControls(this.camera);
-		this.scene.add(this.controls.getObject());
-		this.controls.getObject().translateX(this.world.ws*this.world.bs/2);
-		this.controls.getObject().translateY(-this.world.ws / 32);
-		this.controls.getObject().translateZ(this.world.ws / 16);
+        this.controls = new THREE.PointerLockControls(this.camera);
+        this.scene.add(this.controls.getObject());
+        this.controls.getObject().translateX(this.world.ws*this.world.bs/2);
+        this.controls.getObject().translateY(-this.world.ws / 32);
+        this.controls.getObject().translateZ(this.world.ws / 16);
     }
 
     init_plane() {
@@ -346,32 +362,32 @@ class Game {
     }
 
     init_pointerlock() {
-		let that = this;
-		var pointerlockchange = function(event) {
-			if (document.pointerLockElement === document.body || document.mozPointerLockElement === document.body || document.webkitPointerLockElement === document.body) {
-				that.controls.enabled = true;
-				// blocker.style.display = 'none';
-			} else {
-				that.controls.enabled = false;
-				// blocker.style.display = 'block';
-				// instructions.style.display = '';
-			}
-		};
-		var pointerlockerror = function(event) {
-			// instructions.style.display = '';
-		};
+        let that = this;
+        var pointerlockchange = function(event) {
+            if (document.pointerLockElement === document.body || document.mozPointerLockElement === document.body || document.webkitPointerLockElement === document.body) {
+                that.controls.enabled = true;
+                // blocker.style.display = 'none';
+            } else {
+                that.controls.enabled = false;
+                // blocker.style.display = 'block';
+                // instructions.style.display = '';
+            }
+        };
+        var pointerlockerror = function(event) {
+            // instructions.style.display = '';
+        };
 
-		document.addEventListener('pointerlockchange', pointerlockchange, false);
-		document.addEventListener('mozpointerlockchange', pointerlockchange, false);
-		document.addEventListener('webkitpointerlockchange', pointerlockchange, false);
-		document.addEventListener('pointerlockerror', pointerlockerror, false);
-		document.addEventListener('mozpointerlockerror', pointerlockerror, false);
-		document.addEventListener('webkitpointerlockerror', pointerlockerror, false);
-		document.getElementById('container').addEventListener('click', function(event) {
-			// Ask the browser to lock the pointer
-			document.body.requestPointerLock = document.body.requestPointerLock || document.body.mozRequestPointerLock || document.body.webkitRequestPointerLock;
-			document.body.requestPointerLock();
-		}, false);
+        document.addEventListener('pointerlockchange', pointerlockchange, false);
+        document.addEventListener('mozpointerlockchange', pointerlockchange, false);
+        document.addEventListener('webkitpointerlockchange', pointerlockchange, false);
+        document.addEventListener('pointerlockerror', pointerlockerror, false);
+        document.addEventListener('mozpointerlockerror', pointerlockerror, false);
+        document.addEventListener('webkitpointerlockerror', pointerlockerror, false);
+        document.getElementById('container').addEventListener('click', function(event) {
+            // Ask the browser to lock the pointer
+            document.body.requestPointerLock = document.body.requestPointerLock || document.body.mozRequestPointerLock || document.body.webkitRequestPointerLock;
+            document.body.requestPointerLock();
+        }, false);
     }
 
 
@@ -400,11 +416,11 @@ class Game {
 
         
         this.world = new World();
-		this.world.init();
+        this.world.init();
 
         this.init_lights();
         this.init_controls();
-		this.init_keyboard_and_mouse();
+        this.init_keyboard_and_mouse();
         this.init_pointerlock();
         this.init_selector();
         this.init_plane();
@@ -453,7 +469,7 @@ class Game {
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-		this.composer.setSize(window.innerHeight, window.innerHeight);
+        this.composer.setSize(window.innerHeight, window.innerHeight);
     }
 
     dist(v1, v2) {
@@ -477,7 +493,7 @@ class Game {
         */
 
         if (this.use_shaders) {
-    		this.composer.render();
+            this.composer.render();
         } else {
             this.renderer.render(this.scene, this.camera);
         }
@@ -504,8 +520,9 @@ class Game {
             (cpos.z / this.world.bs) | 0
         );
 
+        // we cant add blocks while syncing or out of world area
         if (! this.syncing
-		 && bpos.x >= 0 && bpos.x < this.world.ws
+         && bpos.x >= 0 && bpos.x < this.world.ws
          && bpos.y >= 0 && bpos.y < this.world.ws
          && bpos.z >= 0 && bpos.z < this.world.ws
         ) {
@@ -547,7 +564,7 @@ class Game {
         this.selector.position.copy(spos);
 
         if (time | 0 % 100 == 0) {
-		    const ms = 0.04;
+            const ms = 0.04;
             if (this.keys_pressed & this.key_w) { this.controls.getObject().translateZ(-ms); }
             if (this.keys_pressed & this.key_s) { this.controls.getObject().translateZ(ms);  }
             if (this.keys_pressed & this.key_a) { this.controls.getObject().translateX(-ms); }

@@ -64,9 +64,9 @@ class World {
                     "find": {
                         "out.s1": "craft",
                         "out.h2": game.tx_world,
-						"blk.i": {"$lte": game.tx_block},
+                        "blk.i": {"$lte": game.tx_block},
                     },
-					"sort": {"blk.t": 1}, // reverse block order so we can overwrite past blocks
+                    "sort": {"blk.t": 1}, // reverse block order so we can overwrite past blocks
                     "skip": pagination_amount*times_queried,
                     "limit": pagination_amount
                 }
@@ -220,7 +220,7 @@ class World {
             }            
         }
         console.timeEnd('rebuild chunks');
-	}
+    }
 
     rebuild_specific_chunk(chunkId) {
         for(let i = 0; i < this.id_map.length; i++) {
@@ -229,7 +229,7 @@ class World {
                 return;
             }            
         }
-	}
+    }
 
     get_chunk(chunkId) {
         for(let i = 0; i < this.id_map.length; i++) {
@@ -240,19 +240,19 @@ class World {
         return null;
     }
 
-	xyz_to_pos(x, y, z) {
-		return (x & 0xFF) << 24
+    xyz_to_pos(x, y, z) {
+        return (x & 0xFF) << 24
              | (y & 0xFF) << 16
              | (z & 0xFF) << 8;
-	}
+    }
 
-	pos_to_xyz(p) {
-		return {
+    pos_to_xyz(p) {
+        return {
             x: ((p >> 24) & 0xFF),
             y: ((p >> 16) & 0xFF),
             z: ((p >> 8)  & 0xFF)
         };
-	}
+    }
 
     byte_to_rgb(c) {
         return {
@@ -294,7 +294,7 @@ class World {
         return chunkId;
     }
 
-	remove_block(x, y, z) {
+    remove_block(x, y, z) {
         let pos      = this.xyz_to_pos(x, y, z);
         let chunkId  = this.get_chunk_id(x, y, z);
         let chunk    = this.get_chunk(chunkId);
@@ -305,11 +305,11 @@ class World {
 
 
         if (chunk == null) {
-			return null; // block doesnt exit
+            return null; // block doesnt exit
         } else {
             for(let i = 0; i < chunk.length; i++) {
                 if (pos == chunk[i].pos) {
-					chunk.splice(i, 1);
+                    chunk.splice(i, 1);
                     this.active[chunkId][cx][cy] ^= 1 << cz; 
 
                     if (this.active[chunkId][cx][cy] == 0) {
@@ -324,7 +324,7 @@ class World {
                 }
             }
 
-			return null; // block doesnt exist
+            return null; // block doesnt exist
         }
     }
 
