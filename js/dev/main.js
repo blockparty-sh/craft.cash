@@ -69,6 +69,21 @@ class Game {
     }
 
     sync_changes() {
+        if (! blockparty.is_logged_in()) {
+            window.alert('you must login to wallet to sync');
+            return;
+        }
+
+        if ((blockparty.fee_per_kb * Math.ceil(game.block_buffer.size / 51)) > (blockparty.get_balance() + blockparty.get_unconfirmed_balance())) {
+            const remaining = blockparty.sat2bch((blockparty.fee_per_kb * Math.ceil(game.block_buffer.size / 51)) - (blockparty.get_balance() + blockparty.get_unconfirmed_balance()));
+            window.alert(`you need ${remaining} bch more to sync`);
+            return;
+        }
+
+        if (game.block_buffer.size == 0) {
+            return;
+        }
+
 		console.log('sync');
 		this.syncing = true;
 		$('#loading-status').show();

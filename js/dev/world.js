@@ -51,11 +51,13 @@ class World {
         let blocks_map = new Map();
 
         let that = this;
-        setTimeout(() => {
-			$('#loading-status').text('downloading blocks...');
-			console.log(`world ${game.tx_world}`);
-			console.log(`blocks ${game.tx_block}`);
+        $('#loading-status').text('downloading blocks...');
+        const pagination_amount = 1000;
 
+
+        const find_more_blocks = (times_queried) => {
+            $('#loading-status').text(`downloading blocks... ${times_queried*pagination_amount*51}`);
+            console.log(`find_more_blocks ${times_queried}`);
             blockparty.query_bitdb({
                 "v": 3,
                 "q": {
@@ -65,15 +67,18 @@ class World {
 						"blk.i": {"$lte": game.tx_block},
                     },
 					"sort": {"blk.t": 1}, // reverse block order so we can overwrite past blocks
-                    "limit": 1000
+                    "skip": pagination_amount*times_queried,
+                    "limit": pagination_amount
                 }
-                
             }, (data) => {
+                console.log(data);
                 let data_chunks = [];
                 for(const m of data.c) {
                     for (const j of m.out) {
                         if (j.s1 == 'craft') {
-                            data_chunks.push(j.h3);
+                            if (typeof j.h3 !== 'undefined') {
+                                data_chunks.push(j.h3);
+                            }
                         }
                     }
                 }
@@ -81,13 +86,14 @@ class World {
                 for(const m of data.u) {
                     for (const j of m.out) {
                         if (j.s1 == 'craft') {
-                            data_chunks.push(j.h3);
+                            if (typeof j.h3 !== 'undefined') {
+                                data_chunks.push(j.h3);
+                            }
                         }
                     }
                 }
 
                 data_chunks = data_chunks.filter(x => typeof(x) === 'string');
-                console.log(data_chunks);
                 data_chunks = data_chunks
                     .map(x => x.match(/.{1,8}/g)
                         .map(y => y.match(/.{1,2}/g)
@@ -106,32 +112,104 @@ class World {
                     }
                 }
 
-
-                let blocks = Array.from(blocks_map.values());
-                
-                let block_adder = () => {
-                    console.time('adding blocks');
-                    const amnt = 17777;
-                    $('#loading-status').text(blocks.length + ' blocks remaining');
-                    for(let i=0; i<amnt && i<blocks.length; ++i) {
-                        let m = blocks[i];
-                        if (m.c != 0) {
-                            that.add_block(m.x, m.y, m.z, m.c);
-                        }
-                    }
-                    blocks.splice(0, amnt);
-
-                    if (blocks.length > 0) {
-                        setTimeout(block_adder, 3);
-                    } else {
-                        that.rebuild_chunks();
-                        $('#loading-status').hide();
-                    }
-                    console.timeEnd('adding blocks');
-                }; block_adder();
-
+                if (data.u.length + data.c.length < pagination_amount) {
+                    add_blocks();
+                } else {
+                    find_more_blocks(times_queried+1);
+                }
             });
-        }, 1);
+        };
+
+        blockparty.initialize_bitsocket_listener({
+            "v": 3,
+            "q": {
+                "find": {
+                    "out.s1": "craft",
+                    "out.h2": game.tx_world,
+                }
+            }
+        }, (data) => {
+            if (data.type != 'mempool') {
+                return;
+            }
+
+            console.log(`adding blocks from bitsocket`);
+            console.log(data);
+            if (data.data.length == 0) {
+                return;
+            }
+
+            let data_chunks = [];
+            for (const j of data.data[0].out) {
+                if (j.s1 == 'craft') {
+                    if (typeof j.h3 !== 'undefined') {
+                        data_chunks.push(j.h3);
+                    }
+                }
+            }
+
+
+            let new_blocks_map = new Map();
+
+            data_chunks = data_chunks.filter(x => typeof(x) === 'string');
+            data_chunks = data_chunks
+                .map(x => x.match(/.{1,8}/g)
+                    .map(y => y.match(/.{1,2}/g)
+                        .map(z => Number.parseInt(z, 16))));
+
+            for (const chunk of data_chunks) {
+                for (const m of chunk) {
+                    if (m.length == 4) {
+                        new_blocks_map.set(that.xyz_to_pos(m[0], m[1], m[2]), {
+                            "x": m[0],
+                            "y": m[1],
+                            "z": m[2],
+                            "c": m[3]
+                        });
+                    }
+                }
+            }
+
+            let blocks = Array.from(new_blocks_map.values());
+            for(let i=0; i<blocks.length; ++i) {
+                const m = blocks[i];
+                if (m.c != 0) {
+                    that.add_block(m.x, m.y, m.z, m.c);
+                } else {
+                    that.remove_block(m.x, m.y, m.z);
+                }
+            }
+
+            
+            that.rebuild_chunks(); // todo: make this only rebuild specific chunks touched
+        });
+
+        const add_blocks = () => {
+            let blocks = Array.from(blocks_map.values());
+            
+            let block_adder = () => {
+                console.time('adding blocks');
+                const amnt = 17777;
+                $('#loading-status').text(blocks.length + ' blocks remaining');
+                for(let i=0; i<amnt && i<blocks.length; ++i) {
+                    let m = blocks[i];
+                    if (m.c != 0) {
+                        that.add_block(m.x, m.y, m.z, m.c);
+                    }
+                }
+                blocks.splice(0, amnt);
+
+                if (blocks.length > 0) {
+                    setTimeout(block_adder, 3);
+                } else {
+                    that.rebuild_chunks();
+                    $('#loading-status').hide();
+                }
+                console.timeEnd('adding blocks');
+            }; block_adder();
+        };
+
+        find_more_blocks(0);
     }
 
     rebuild_chunks() {

@@ -260,6 +260,14 @@
                             continue;
                         }
 
+                        if (typeof o.h2 !== 'string') {
+                            continue;
+                        }
+
+                        if (typeof o.h3 !== 'string') {
+                            continue;
+                        }
+
                         world = o.h2;
                         blocks = o.h3.length / 8;
                         break;
@@ -309,15 +317,19 @@
                     'bitdb_token': 'qp9rzh6levrrn5r5x4slc6q7qxhl452dty5nuyuq6m',
                     'fee_per_kb': 500,
                 });
+
+
+                game = new Game(
+                    get_url_param('world', '00000000')
+                        .replace(/[^0-9a-fA-F]/, '')
+                        .padStart(8, '0')
+                        .substring(0, 8),
+                    get_url_param('block', 100000000)|0
+                );
+                game.init();
+
+
                 blockparty.after('login', () => {
-                    game = new Game(
-                        get_url_param('world', '00000000')
-                            .replace(/[^0-9a-fA-F]/, '')
-                            .padStart(8, '0')
-                            .substring(0, 8),
-                        get_url_param('block', 100000000)|0
-                    );
-                    game.init();
                 });
             });
         </script>
