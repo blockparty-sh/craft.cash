@@ -158,11 +158,17 @@
                 }, (data) => {
                     console.log(data);
                     let username = '';
+                    let outs = [];
                     if (data.c.length > 0) {
-                        username = data.c[0].out[0].s2;
+                        outs = data.c[0].out;
                     }
                     if (data.u.length > 0) {
-                        username = data.u[0].out[0].s2;
+                        outs = data.u[0].out;
+                    }
+                    for (const o of outs) {
+                        if (o.h1 === "6d01" && o.s2) {
+                            username = o.s2;
+                        }
                     }
                     document.getElementById('current-name').innerText = username;
                 });

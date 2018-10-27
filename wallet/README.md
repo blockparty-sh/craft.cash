@@ -4,6 +4,8 @@ Blockparty wallet is an in-browser [Bitcoin Cash](https://www.bitcoincash.org/) 
 
 Please note that this project is in development, has not been battle tested, and is not really designed for amounts of money you aren't ok with losing. There may be bugs or security issues with it. The codebase is intended to be small enough for you to audit yourself and determine if it is useful for your project.
 
+![Picture of wallet](picture.png)
+
 #### Thanks to the following projects which made this possible
 
 - https://bitdb.network/
