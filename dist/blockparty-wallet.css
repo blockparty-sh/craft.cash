@@ -1887,3 +1887,7 @@
     position:absolute;
     bottom:0px;
 }
+#blockparty-wallet #revision {
+    font-size: 0.7rem;
+    margin:0;
+}

@@ -12,6 +12,8 @@ const sb         = require('satoshi-bitcoin');
 const app = {};
 app.bch = bch;
 app.handlebars = Handlebars;
+app.revision = fs.readFileSync(__dirname + '/../.git/refs/heads/master', 'utf-8');
+
 
 app.append_to   = 'body'; // which element to append the wallet to
 app.bitdb_token = '';     // enter token from https://bitdb.network/v3/dashboard
@@ -79,6 +81,7 @@ app.init = (options = {}) => {
         .insertAdjacentHTML('beforeend', app.wallet_template({
             'address':  new_address.address,
             'mnemonic': new_address.mnemonic,
+            'revision': app.revision,
         }));
 
     // set up libraries (materialize and scrollbar)
@@ -86,7 +89,6 @@ app.init = (options = {}) => {
     for (const el of document.querySelectorAll('#blockparty-wallet .card-fixed-height')) {
         new SimpleBar(el);
     }
-
 
 
     // query elements
@@ -137,8 +139,10 @@ app.init = (options = {}) => {
     app.balance_amnt_el.addEventListener('click', () => {
         if (app.blockparty_wallet_el.classList.contains('minimized')) {
             app.blockparty_wallet_el.classList.remove('minimized');
+            localStorage.setItem('blockparty-wallet.minimized', false);
         } else {
             app.blockparty_wallet_el.classList.add('minimized');
+            localStorage.setItem('blockparty-wallet.minimized', true);
         }
     });
 
@@ -354,6 +358,7 @@ app.get_balance             = () => +localStorage.getItem('blockparty-wallet.bal
 app.get_unconfirmed_balance = () => +localStorage.getItem('blockparty-wallet.unconfirmed-balance');
 app.get_wif         = () => localStorage.getItem('blockparty-wallet.wif');
 app.is_logged_in    = () => !!app.get_wif();
+app.is_minimized    = () => localStorage.getItem('blockparty-wallet.minimized') === 'true';
 app.get_private_key = () => new bch.PrivateKey(app.get_wif());
 app.get_address     = () => app.get_private_key().toAddress();
 app.get_address_str = () => app.get_address().toString(bch.Address.CashAddrFormat);
@@ -488,6 +493,15 @@ app.login = (wif, callback) => {
     app.call_before('login', [wif]);
 
     localStorage.setItem('blockparty-wallet.wif', wif);
+
+    // we might have just reloaded the page
+    if (localStorage.getItem('blockparty-wallet.minimized') == null) {
+        localStorage.setItem('blockparty-wallet.minimized', false);
+    } else {
+        if (app.is_minimized()) {
+            app.blockparty_wallet_el.classList.add('minimized');
+        }
+    }
 
     if (app.default_bitsocket_listener) {
         app.bitsocket_listener = app.default_bitsocket_listener();
