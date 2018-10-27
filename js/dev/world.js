@@ -67,6 +67,10 @@ class World {
                         "blk.i": {"$lte": game.tx_block},
                     },
                     "sort": {"blk.t": 1}, // reverse block order so we can overwrite past blocks
+                    "project": {
+                        "out.$": 1,
+                        "_id": 0
+                    },
                     "skip": pagination_amount*times_queried,
                     "limit": pagination_amount
                 }
