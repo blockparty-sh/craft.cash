@@ -101,9 +101,6 @@
 #balance-amnt {
     font-family: 'Kodchasan', sans-serif;
 }
-#balance-amnt:hover {
-    cursor: pointer;
-}
 #unconfirmed-balance-amnt {
     font-family: 'Kodchasan', sans-serif;
     margin:0px;
@@ -177,4 +174,7 @@
 #revision {
     font-size: 0.7rem;
     margin:0;
+}
+.click-to-minimize:hover {
+    cursor: pointer;
 }
