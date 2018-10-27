@@ -136,15 +136,17 @@ app.init = (options = {}) => {
 
 
     // add listeners
-    app.balance_amnt_el.addEventListener('click', () => {
-        if (app.blockparty_wallet_el.classList.contains('minimized')) {
-            app.blockparty_wallet_el.classList.remove('minimized');
-            localStorage.setItem('blockparty-wallet.minimized', false);
-        } else {
-            app.blockparty_wallet_el.classList.add('minimized');
-            localStorage.setItem('blockparty-wallet.minimized', true);
-        }
-    });
+    document
+        .querySelectorAll('#blockparty-wallet .click-to-minimize')
+        .forEach((item) => item.addEventListener('click', () => {
+            if (app.blockparty_wallet_el.classList.contains('minimized')) {
+                app.blockparty_wallet_el.classList.remove('minimized');
+                localStorage.setItem('blockparty-wallet.minimized', false);
+            } else {
+                app.blockparty_wallet_el.classList.add('minimized');
+                localStorage.setItem('blockparty-wallet.minimized', true);
+            }
+        }));
 
     app.logout_btn_el.addEventListener('click', () => {
         app.logout(app.update_logout_html);

@@ -1818,9 +1818,6 @@
 #blockparty-wallet #balance-amnt {
     font-family: 'Kodchasan', sans-serif;
 }
-#blockparty-wallet #balance-amnt:hover {
-    cursor: pointer;
-}
 #blockparty-wallet #unconfirmed-balance-amnt {
     font-family: 'Kodchasan', sans-serif;
     margin:0px;
@@ -1890,4 +1887,7 @@
 #blockparty-wallet #revision {
     font-size: 0.7rem;
     margin:0;
+}
+#blockparty-wallet .click-to-minimize:hover {
+    cursor: pointer;
 }
