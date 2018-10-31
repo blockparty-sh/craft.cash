@@ -88,6 +88,7 @@ class Game {
         this.syncing = true;
         $('#loading-status').show();
         $('#loading-status').text(`syncing (${game.block_buffer.size} remaining)`);
+        $('#block-changes-count').text(game.block_buffer.size);
 
         let serialized_block_buf = "";
 
@@ -127,6 +128,7 @@ class Game {
             setTimeout(() => {
                 blockparty.update_balance(blockparty.update_balance_html);
                 blockparty.update_utxos(() => {
+                    $('#block-changes-count').text(that.block_buffer.size);
                     if (game.block_buffer.size > 0) {
                         game.sync_changes();
                     } else {
@@ -215,6 +217,11 @@ class Game {
                 case 'e': that.keys_pressed ^= that.key_e; break;
                 case 'c': this.show_color_chooser(); break;
                 case 'z': this.sync_changes(); break;
+                case 'h':
+                    //document.getElementById('instructions').style.display = 'none';
+                    //document.getElementById('footer').style.display = 'none';
+                    //document.getElementById('blockparty-wallet').style.display = 'none';
+                    break;
             }
 
             const ms = 0.1;
@@ -386,7 +393,11 @@ class Game {
         document.getElementById('container').addEventListener('click', function(event) {
             // Ask the browser to lock the pointer
             document.body.requestPointerLock = document.body.requestPointerLock || document.body.mozRequestPointerLock || document.body.webkitRequestPointerLock;
-            document.body.requestPointerLock();
+            if (that.selected_color == 0) {
+                window.alert('Press `c` to open color selector');
+            } else {
+                document.body.requestPointerLock();
+            }
         }, false);
     }
 
@@ -534,6 +545,7 @@ class Game {
 
                 if(chunkId != null) {
                     this.block_buffer.set(buf_pos, this.selected_color);
+                    $('#block-changes-count').text(this.block_buffer.size);
                 }
             }
 
@@ -547,6 +559,8 @@ class Game {
                     } else {
                         this.block_buffer.set(buf_pos, 0); // 0 color for delete
                     }
+
+                    $('#block-changes-count').text(this.block_buffer.size);
                 }
             }
 
