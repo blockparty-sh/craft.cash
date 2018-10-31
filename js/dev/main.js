@@ -22,7 +22,7 @@ class Game {
         this.mouse;
         this.block_buffer = new Map(); // what we'll serialize and send
         this.syncing = false; // currently syncing? dont place blocks 
-        this.selected_color = 0;
+        this.selected_color = 255;
 
         // Scene settings
         this.screenWidth = window.innerWidth;
