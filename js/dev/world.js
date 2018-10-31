@@ -58,13 +58,13 @@ class World {
         const find_more_blocks = (times_queried) => {
             $('#loading-status').text(`downloading blocks... ${times_queried*pagination_amount*51}`);
             console.log(`find_more_blocks ${times_queried}`);
-            blockparty.query_bitdb({
+
+            const query = {
                 "v": 3,
                 "q": {
                     "find": {
                         "out.s1": "craft",
-                        "out.h2": game.tx_world,
-                        "blk.i": {"$lte": game.tx_block},
+                        "out.h2": game.tx_world
                     },
                     "sort": {"blk.t": 1}, // reverse block order so we can overwrite past blocks
                     "project": {
@@ -74,7 +74,13 @@ class World {
                     "skip": pagination_amount*times_queried,
                     "limit": pagination_amount
                 }
-            }, (data) => {
+            };
+
+            if (game.tx_block !== 100000000) {
+                query['q']['find']['blk.i'] = {"$lte": game.tx_block};
+            }
+
+            blockparty.query_bitdb(query, (data) => {
                 console.log(data);
                 let data_chunks = [];
                 for(const m of data.c) {

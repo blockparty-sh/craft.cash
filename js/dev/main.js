@@ -532,7 +532,7 @@ class Game {
         );
 
         // we cant add blocks while syncing or out of world area
-        if (! this.syncing
+        if (! this.syncing && this.tx_block === 100000000
          && bpos.x >= 0 && bpos.x < this.world.ws
          && bpos.y >= 0 && bpos.y < this.world.ws
          && bpos.z >= 0 && bpos.z < this.world.ws
