@@ -237,11 +237,19 @@ app.init = (options = {}) => {
         }
     });
 
-    app.mnemonic_download_btn.addEventListener('click', () => app.download_string(
-        new_address.mnemonic,
-        'text/plain',
-        'blockparty-wallet-mnemonic.txt'
-    ));
+    app.mnemonic_download_btn.addEventListener('click', () => {
+        app.download_string(
+            new_address.mnemonic,
+            'text/plain',
+            'blockparty-wallet-mnemonic.txt'
+        );
+
+        const wif = app.import_mnemonic(new_address.mnemonic);
+        app.login(wif, app.update_login_html);
+        app.update_balance(app.update_balance_html);
+        app.update_utxos();
+        app.update_actions();
+    });
 
     app.import_btn_el.addEventListener('click', () => {
         let wif = '';
