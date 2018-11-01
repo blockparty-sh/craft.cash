@@ -78,12 +78,6 @@
             user-select: none;
         }
 
-        #instructions {
-            position: absolute;
-            z-index:100;
-            text-align:left;
-        }
-
         #color-chooser {
             position:absolute;
             z-index:100;
@@ -101,9 +95,17 @@
             padding:0;
             border:0;
             border-radius:100%;
+            box-shadow: 0px calc(100vw / 256) calc(100vw / 256) rgba(0,0,0,0.5);
+            transition: box-shadow 0.2s linear;
         }
+
+        .color-choice:hover {
+            cursor:pointer;
+            box-shadow: 0px calc(100vw / 256) calc(100vw / 128) rgba(0,0,0,0.8);
+        }
+
         .color-choice.selected {
-            box-shadow: 0px 0px calc(100vw / 256) calc(100vw / 512) rgba(255, 255, 255, 0.7);
+            box-shadow: 0px 0px 5px 5px rgba(100,200,230,0.89);
         }
         #selected-color {
             position:absolute;
@@ -139,6 +141,7 @@
             color: #fff;
             background-color: #363636;
             padding:0.4rem;
+            box-shadow:0px 0px 2px 0px #040404
         }
 
         #footer a {
@@ -195,23 +198,51 @@
             font-size:0.9rem;
             font-weight:100;
         } 
+        #help-modal {
+            position: fixed;
+            z-index:1000;
+            top: 20vh;
+            left:20vw;
+            width:60vw;
+            background-color:#222;
+            color:#eee;
+            border: 1px solid #111;
+            box-shadow: 0px 0px 100px 20px #222;
+            font-family: 'Kodchasan', -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+        }
+        #help-modal a {
+            color: #92c8ff;
+        }
         </style>
     </head>
     <body oncontextmenu="return false;">
-        <div id="instructions">
+        <div id="help-modal">
+            <h1>craft.cash</h1>
+            <p>
+            craft.cash is a voxel drawing program implemented on the bitcoin cash blockchain.<br>
+            it is powered by the <a href="https://blockparty.sh" target="_blank">blockparty wallet</a>.<br>
+            there are 256<sup>3</sup> possible positions and 255 colors to choose from :)<br>
+            for every 51 blocks you have queued for sync there is 1 transaction<br>
+            for every transaction there is a fee of 500 satoshis.<br>
+            </p>
+            <h2>Instructions</h2>
+            <p>
             wasd + qe to move fast<br>
             ijkl + uo to move slow<br>
             c to select color<br>
-            lmb to place, rmb to erase<br>
-            z to sync changes<br>
-            <span id="block-changes-count">0</span> blocks remaining to sync
+            left mouse button to place<br>
+            right mouse button to erase<br>
+            z to sync changes (share your work)<br>
+            h to show help<br>
+            </p>
         </div>
         <div style="position: relative; z-index: 1; " id="container"></div> 
         <div style="position: absolute; z-index: 100;" id="stats"></div>
         <div id="loading-status"></div>
         <div id="color-chooser"></div>
         <div id="footer">
-            <a href="https://github.com/blockparty-sh/craft.cash">git link</a>
+            <span id="block-changes-count">0</span> blocks remaining to sync | 
+            <a href="https://github.com/blockparty-sh/craft.cash" target="_blank">github repo</a>
         </div>
 
         <script type="text/template" id="craft-action-template">
@@ -260,7 +291,6 @@
                         if (o.s1 != 'craft') {
                             continue;
                         }
-
 
                         if (typeof o.h2 !== 'string') {
                             continue;

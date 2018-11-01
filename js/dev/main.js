@@ -218,9 +218,8 @@ class Game {
                 case 'c': this.show_color_chooser(); break;
                 case 'z': this.sync_changes(); break;
                 case 'h':
-                    //document.getElementById('instructions').style.display = 'none';
-                    //document.getElementById('footer').style.display = 'none';
-                    //document.getElementById('blockparty-wallet').style.display = 'none';
+                    $('#help-modal').show();
+                    document.exitPointerLock();
                     break;
             }
 
@@ -396,6 +395,7 @@ class Game {
             if (that.selected_color == 0) {
                 window.alert('Press `c` to open color selector');
             } else {
+                $('#help-modal').hide();
                 document.body.requestPointerLock();
             }
         }, false);
