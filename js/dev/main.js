@@ -287,7 +287,7 @@ class Game {
 
         let effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
         effectFXAA.uniforms[ 'resolution' ].value.set(1 / window.innerWidth, 1 / window.innerHeight);
-        let bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight ), 0.86, 0.12, 0.9, 0.9); //1.0, 9, 0.5, 512);
+        let bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight ), 0.26, 0.12, 0.9, 0.9); //1.0, 9, 0.5, 512);
         bloomPass.renderToScreen = true;
 
         this.composer.addPass(effectFXAA);
