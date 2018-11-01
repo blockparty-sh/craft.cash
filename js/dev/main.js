@@ -350,7 +350,7 @@ class Game {
     init_plane() {
         let planeSize = this.world.ws*(this.world.bs);
         let geo = new THREE.PlaneBufferGeometry(planeSize, planeSize, 1, 1);
-        let mat = new THREE.MeshLambertMaterial({color: 0xEED6AF});
+        let mat = new THREE.MeshLambertMaterial({color: 0xB3A184});
         let mesh = new THREE.Mesh(geo, mat);
         mesh.position.set(planeSize/2, -0.09, planeSize/2); // -0.09 fixes flickering
         mesh.rotation.x = -Math.PI/2;
@@ -432,7 +432,7 @@ class Game {
         this.init_keyboard_and_mouse();
         this.init_pointerlock();
         this.init_selector();
-        // this.init_plane();
+        this.init_plane();
         this.init_water();
         this.init_color_chooser();
 
