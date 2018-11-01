@@ -432,7 +432,7 @@ class Game {
         this.init_keyboard_and_mouse();
         this.init_pointerlock();
         this.init_selector();
-        this.init_plane();
+        // this.init_plane();
         this.init_water();
         this.init_color_chooser();
 
