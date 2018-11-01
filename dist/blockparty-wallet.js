@@ -127816,7 +127816,7 @@ const sb         = require('satoshi-bitcoin');
 const app = {};
 app.bch = bch;
 app.handlebars = Handlebars;
-app.revision = "1d343028420e6884435834fc67c33cb39f2ca47f\n";
+app.revision = "6c53420d556f8cfec85fecfdf7882b66288edb2b\n";
 
 
 app.append_to   = 'body'; // which element to append the wallet to
@@ -128071,6 +128071,9 @@ app.init = (options = {}) => {
         app.update_actions();
     });
 
+    if (app.is_minimized()) {
+        app.blockparty_wallet_el.classList.add('minimized');
+    }
 
     // check if user is logged in, if so then update frontend
     if (app.is_logged_in()) {

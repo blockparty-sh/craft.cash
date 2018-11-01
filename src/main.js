@@ -267,6 +267,9 @@ app.init = (options = {}) => {
         app.update_actions();
     });
 
+    if (app.is_minimized()) {
+        app.blockparty_wallet_el.classList.add('minimized');
+    }
 
     // check if user is logged in, if so then update frontend
     if (app.is_logged_in()) {
