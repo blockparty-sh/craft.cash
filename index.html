@@ -213,9 +213,27 @@
         #help-modal a {
             color: #92c8ff;
         }
+
+        #instructions {
+            position: absolute;
+            z-index:100;
+            text-align:left;
+        }
+
         </style>
     </head>
     <body oncontextmenu="return false;">
+        <div id="instructions">
+            esc to exit pointerlock<br>
+            wasd + qe to move quickly<br>
+            ijkl + uo to move precisely<br>
+            c to select color<br>
+            left mouse button to place<br>
+            right mouse button to erase<br>
+            z to sync changes (share your work)<br>
+            h to show help<br>
+            H to toggle showing instructions<br>
+        </div>
         <div id="help-modal">
             <h1>craft.cash</h1>
             <p>
@@ -227,13 +245,14 @@
             </p>
             <h2>Instructions</h2>
             <p>
-            wasd + qe to move fast<br>
-            ijkl + uo to move slow<br>
-            c to select color<br>
-            left mouse button to place<br>
-            right mouse button to erase<br>
-            z to sync changes (share your work)<br>
-            h to show help<br>
+            wasd + qe to move fast (as long as key is pressed you'll move)<br>
+            ijkl + uo to move slow (every time you tap a key you'll move)<br>
+            c to select color, just click on what color you'd like<br>
+            left mouse button to place blocks, to overwrite a block you must erase<br>
+            right mouse button to erase a block<br>
+            z to sync changes (this shares your work with the world)<br>
+            h to show this help pane<br>
+            H to toggle showing instructions in corner<br>
             </p>
         </div>
         <div style="position: relative; z-index: 1; " id="container"></div> 
@@ -366,6 +385,10 @@
                 );
                 game.init();
             });
+            const show_help_modal = () => {
+                $('#help-modal').show();
+                document.exitPointerLock();
+            };
         </script>
     </body>
 </html>

@@ -217,10 +217,8 @@ class Game {
                 case 'e': that.keys_pressed ^= that.key_e; break;
                 case 'c': this.show_color_chooser(); break;
                 case 'z': this.sync_changes(); break;
-                case 'h':
-                    $('#help-modal').show();
-                    document.exitPointerLock();
-                    break;
+                case 'h': show_help_modal(); break;
+                case 'H': $('#instructions').toggle(); break;
             }
 
             const ms = 0.1;
