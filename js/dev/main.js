@@ -166,6 +166,8 @@ class Game {
             $('#selected-color').css('background-color', html_color);
             $('#selected-color').css('animation', 'none');
             $('#selected-color').show();
+
+            document.body.requestPointerLock();
         });
 
         $('#selected-color').click(this.show_color_chooser);
