@@ -544,7 +544,7 @@ class Game {
 
             const buf_pos = this.world.xyz_to_pos(bpos.x, bpos.y, bpos.z);
             if(this.mouse.left && this.selected_color != 0) {
-                chunkId = this.world.remove_block(bpos.x, bpos.y, bpos.z);
+                this.world.remove_block(bpos.x, bpos.y, bpos.z);
                 chunkId = this.world.add_block(bpos.x, bpos.y, bpos.z, this.selected_color);
 
                 if(chunkId != null) {

@@ -322,13 +322,14 @@ class World {
                     chunk.splice(i, 1);
                     this.active[chunkId][cx][cy] ^= 1 << cz; 
 
+                    /*
                     if (this.active[chunkId][cx][cy] == 0) {
                         this.active[chunkId][cx].splice(cy, 1);
 
                         if (this.active[chunkId][cx].length == 0) {
                             this.active[chunkId].splice(cx, 1);
                         }
-                    }
+                    }*/
 
                     return chunkId;
                 }
