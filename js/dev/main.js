@@ -517,8 +517,11 @@ class Game {
         const time = this.clock.getElapsedTime() * 10;
 
         const cobj = this.controls.getObject();
-        // get position in front of and below camera
-        const cpos = new THREE.Vector3(0, -1, -1);
+
+        const cdir = new THREE.Vector3();
+        game.controls.getDirection(cdir);
+
+        const cpos = new THREE.Vector3(0, cdir.y, -1);
         cpos.applyQuaternion(cobj.quaternion);
         cpos.add(cobj.position);
 
