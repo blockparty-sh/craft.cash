@@ -105,11 +105,6 @@ class Game {
             if (block_keys.length == 51) break; // can only store this much in op_return
         }
 
-        for (const i of block_keys) {
-            game.block_buffer.delete(i);
-        } 
-
-
         let tx = new blockparty.bch.Transaction();
         tx.from(blockparty.get_utxos());
         tx = blockparty.add_op_return_data(tx, [
@@ -125,6 +120,10 @@ class Game {
 
         let that = this;
         blockparty.broadcast_tx(tx, () => {
+            for (const i of block_keys) {
+                game.block_buffer.delete(i);
+            }
+
             setTimeout(() => {
                 blockparty.update_balance(blockparty.update_balance_html);
                 blockparty.update_utxos(() => {
