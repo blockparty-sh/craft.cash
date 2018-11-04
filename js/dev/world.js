@@ -34,7 +34,7 @@ class Block {
 class World {
     constructor() {
         this.ws = 256; //worldsize
-        this.cs = 16; // chunksize
+        this.cs = 32; // chunksize
         this.bs = 0.1; // blocksize
         this.chunks; // Chunks + blocks [chunkId][blocks]
         this.active; // chunks active blocks
@@ -401,7 +401,7 @@ class World {
             color = this.byte_to_rgb(this.chunks[vcid][i].color & 0xFF);   // color
 
             let pos = this.world_to_chunk_position(x, y, z);
-            if (pos.z+1 < 16) {
+            if (pos.z+1 < this.cs) {
                 front = (active[pos.x][pos.y] >> (pos.z+1)) & 0x01;
             } 
             // Check2: z-1 is active?
