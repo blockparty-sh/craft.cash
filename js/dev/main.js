@@ -119,9 +119,6 @@ class Game {
 
         if (total_tiny > blockparty.fee_per_kb) {
             console.log('total_tiny is enough');
-            // for (let i=0; i<total_tiny - Math.ceil(tx.inputs.length * 260) - (blockparty.fee_per_kb*2); i+= blockparty.fee_per_kb) {
-            //    tx.to(blockparty.get_address(), blockparty.fee_per_kb);
-            // }
         } else {
             console.log('total_tiny too small');
             for (let utxo of utxos) {
@@ -141,7 +138,6 @@ class Game {
             }
         }
 
-        // tx.from(blockparty.get_utxos());
         tx = blockparty.add_op_return_data(tx, [
             {'type': 'str', 'v': 'craft'}, // prefix: 1+1+5 = 7
             {'type': 'hex', 'v': this.tx_world}, // world: 1+1+4 = 6
