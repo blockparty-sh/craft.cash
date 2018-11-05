@@ -106,19 +106,56 @@ class Game {
         }
 
         let tx = new blockparty.bch.Transaction();
-        tx.from(blockparty.get_utxos());
+
+        const utxos = blockparty.get_utxos();
+        let total_tiny = 0;
+        for (let utxo of utxos) {
+            if (utxo.satoshis >= 546 && utxo.satoshis < blockparty.fee_per_kb) {
+                console.log('found tiny one');
+                tx.from(utxo);
+                total_tiny += utxo.satoshis;
+            }
+        }
+
+        if (total_tiny > blockparty.fee_per_kb) {
+            console.log('total_tiny is enough');
+            // for (let i=0; i<total_tiny - Math.ceil(tx.inputs.length * 260) - (blockparty.fee_per_kb*2); i+= blockparty.fee_per_kb) {
+            //    tx.to(blockparty.get_address(), blockparty.fee_per_kb);
+            // }
+        } else {
+            console.log('total_tiny too small');
+            for (let utxo of utxos) {
+                if (utxo.satoshis == blockparty.fee_per_kb) {
+                    console.log('found small one');
+                    tx.from(utxo);
+                    break;
+                } else {
+                    console.log('found big one');
+                    tx.from(utxo);
+                    for (let i=0; i<utxo.satoshis - Math.ceil(utxo.satoshis / blockparty.fee_per_kb * 260) - (blockparty.fee_per_kb*2); i += blockparty.fee_per_kb) {
+                        console.log('added output');
+                        tx.to(blockparty.get_address(), blockparty.fee_per_kb);
+                    }
+                    break;
+                }
+            }
+        }
+
+        // tx.from(blockparty.get_utxos());
         tx = blockparty.add_op_return_data(tx, [
             {'type': 'str', 'v': 'craft'}, // prefix: 1+1+5 = 7
             {'type': 'hex', 'v': this.tx_world}, // world: 1+1+4 = 6
             {'type': 'hex', 'v': serialized_block_buf}, // data-- 7+6+1 = 14... 220-14=206 bytes remain
         ]);
-        tx.feePerKb(blockparty.fee_per_kb);
         tx.change(blockparty.get_address());
+        tx.feePerKb(blockparty.fee_per_kb);
         tx = blockparty.clean_tx_dust(tx);
         tx = tx.sign(blockparty.get_private_key());
+        window.tx = tx;
         console.log(tx);
 
         let that = this;
+
         blockparty.broadcast_tx(tx, () => {
             for (const i of block_keys) {
                 game.block_buffer.delete(i);
