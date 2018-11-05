@@ -180,6 +180,7 @@ class World {
                 }
             }
 
+            let chunk_update_set = new Set();
             let blocks = Array.from(new_blocks_map.values());
             for(let i=0; i<blocks.length; ++i) {
                 const m = blocks[i];
@@ -188,10 +189,10 @@ class World {
                 } else {
                     that.remove_block(m.x, m.y, m.z);
                 }
+                chunk_update_set.add(this.get_chunk_id(m.x, m.y, m.z));
             }
 
-            
-            that.rebuild_chunks(); // todo: make this only rebuild specific chunks touched
+            [...chunk_update_set].forEach(id => that.rebuild_specific_chunk(id));
         });
 
         const add_blocks = () => {
