@@ -242,6 +242,8 @@ class Game {
             }
         });
         $(window).on('keyup',(e) => {
+            const ms = 0.1;
+
             switch(e.key) {
                 case 'w': that.keys_pressed ^= that.key_w; break;
                 case 'a': that.keys_pressed ^= that.key_a; break;
@@ -249,27 +251,30 @@ class Game {
                 case 'd': that.keys_pressed ^= that.key_d; break;
                 case 'q': that.keys_pressed ^= that.key_q; break;
                 case 'e': that.keys_pressed ^= that.key_e; break;
+
+                case 'i': this.controls.getObject().translateZ(-ms); break;
+                case 'k': this.controls.getObject().translateZ(ms); break;
+                case 'j': this.controls.getObject().translateX(-ms); break;
+                case 'l': this.controls.getObject().translateX(ms); break;
+                case 'u': {
+                    if(this.controls.getObject().position.y > 1) {
+                        this.controls.getObject().translateY(-ms);
+                    }
+                    break;
+                }
+                case 'o': this.controls.getObject().translateY(ms); break;
+
                 case 'c': this.show_color_chooser(); break;
                 case 'z': this.sync_changes(); break;
                 case 'h': show_help_modal(); break;
                 case 'H': $('#instructions').toggle(); break;
             }
 
-            const ms = 0.1;
-            switch(e.key) {
-                case 'i': this.controls.getObject().translateZ(-ms); break;
-                case 'k': this.controls.getObject().translateZ(ms); break;
-                case 'j': this.controls.getObject().translateX(-ms); break;
-                case 'l': this.controls.getObject().translateX(ms); break;
-                case 'u': this.controls.getObject().translateY(ms); break;
-                case 'o': {
-                    if(this.controls.getObject().position.y > 1) {
-                        this.controls.getObject().translateY(-ms);
-                    }
-                    break;
+            if (e.ctrlKey) {
+                switch (e.key) {
+                    case 'z': console.log('CTRLZ'); break;
                 }
             }
-
         });
 
         this.mouse = {};
@@ -620,8 +625,8 @@ class Game {
             if (this.keys_pressed & this.key_s) { this.controls.getObject().translateZ(ms);  }
             if (this.keys_pressed & this.key_a) { this.controls.getObject().translateX(-ms); }
             if (this.keys_pressed & this.key_d) { this.controls.getObject().translateX(ms);  }
-            if (this.keys_pressed & this.key_q) { this.controls.getObject().translateY(ms);  }
-            if (this.keys_pressed & this.key_e) { if(cobj.position.y > 1) this.controls.getObject().translateY(-ms); }
+            if (this.keys_pressed & this.key_q) { if(cobj.position.y > 1) this.controls.getObject().translateY(-ms); }
+            if (this.keys_pressed & this.key_e) { this.controls.getObject().translateY(ms);  }
         }
 
         this.draw_water(time);
