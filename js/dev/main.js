@@ -429,12 +429,8 @@ class Game {
         document.getElementById('container').addEventListener('click', function(event) {
             // Ask the browser to lock the pointer
             document.body.requestPointerLock = document.body.requestPointerLock || document.body.mozRequestPointerLock || document.body.webkitRequestPointerLock;
-            if (that.selected_color == 0) {
-                window.alert('Press `c` to open color selector');
-            } else {
-                $('#help-modal').hide();
-                document.body.requestPointerLock();
-            }
+            $('#help-modal').hide();
+            document.body.requestPointerLock();
         }, false);
     }
 
