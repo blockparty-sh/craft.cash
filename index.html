@@ -393,8 +393,12 @@
                 game.init();
             });
             const show_help_modal = () => {
-                $('#help-modal').show();
-                document.exitPointerLock();
+                $('#help-modal').toggle();
+                if ($('#help-modal').is(':visible')) {
+                    document.exitPointerLock();
+                } else {
+                    document.body.requestPointerLock();
+                }
             };
         </script>
     </body>
