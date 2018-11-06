@@ -117,7 +117,7 @@ class Game {
             }
         }
 
-        if (total_tiny > blockparty.fee_per_kb) {
+        if (total_tiny > blockparty.fee_per_kb + (Math.ceil(tx.inputs.length / 1000 * 260) * blockparty.fee_per_kb)) {
             console.log('total_tiny is enough');
         } else {
             console.log('total_tiny too small');
@@ -126,7 +126,7 @@ class Game {
                     console.log('found small one');
                     tx.from(utxo);
                     break;
-                } else {
+                } else if (utxo.satoshis > blockparty.fee_per_kb) {
                     console.log('found big one');
                     tx.from(utxo);
                     for (let i=0; i<utxo.satoshis - Math.ceil(utxo.satoshis / blockparty.fee_per_kb * 260) - (blockparty.fee_per_kb*2); i += blockparty.fee_per_kb) {
