@@ -406,29 +406,27 @@ class Game {
 
     init_pointerlock() {
         let that = this;
-        var pointerlockchange = function(event) {
-            if (document.pointerLockElement === document.body || document.mozPointerLockElement === document.body || document.webkitPointerLockElement === document.body) {
-                that.controls.enabled = true;
-                // blocker.style.display = 'none';
-            } else {
-                that.controls.enabled = false;
-                // blocker.style.display = 'block';
-                // instructions.style.display = '';
-            }
+        const pl_change = (e) => {
+            that.controls.enabled = (
+                document.pointerLockElement === document.body
+             || document.mozPointerLockElement === document.body
+             || document.webkitPointerLockElement === document.body);
         };
-        var pointerlockerror = function(event) {
-            // instructions.style.display = '';
+        const pl_error = (e) => {
+            window.alert('error occurred when requesting pointerlock');
         };
 
-        document.addEventListener('pointerlockchange', pointerlockchange, false);
-        document.addEventListener('mozpointerlockchange', pointerlockchange, false);
-        document.addEventListener('webkitpointerlockchange', pointerlockchange, false);
-        document.addEventListener('pointerlockerror', pointerlockerror, false);
-        document.addEventListener('mozpointerlockerror', pointerlockerror, false);
-        document.addEventListener('webkitpointerlockerror', pointerlockerror, false);
-        document.getElementById('container').addEventListener('click', function(event) {
-            // Ask the browser to lock the pointer
-            document.body.requestPointerLock = document.body.requestPointerLock || document.body.mozRequestPointerLock || document.body.webkitRequestPointerLock;
+        document.addEventListener('pointerlockchange',       pl_change, false);
+        document.addEventListener('mozpointerlockchange',    pl_change, false);
+        document.addEventListener('webkitpointerlockchange', pl_change, false);
+        document.addEventListener('pointerlockerror',        pl_error, false);
+        document.addEventListener('mozpointerlockerror',     pl_error, false);
+        document.addEventListener('webkitpointerlockerror',  pl_error, false);
+        document.getElementById('container').addEventListener('click', (e) => {
+            document.body.requestPointerLock = (
+                document.body.requestPointerLock
+             || document.body.mozRequestPointerLock
+             || document.body.webkitRequestPointerLock);
             $('#help-modal').hide();
             document.body.requestPointerLock();
         }, false);
