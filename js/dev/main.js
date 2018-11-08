@@ -245,7 +245,12 @@ class Game {
         let that = this;
         $(window).on('keydown', function(e) {
             if (e.ctrlKey) {
-                e.preventDefault();
+                switch (e.key) {
+                    case 's':
+                    case 'z':
+                        e.preventDefault();
+                        break;
+                }
                 return;
             }
 
