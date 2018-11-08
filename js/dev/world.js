@@ -54,6 +54,41 @@ class World {
         $('#loading-status').text('downloading blocks...');
         const pagination_amount = 1000;
 
+        const parse_data_chunks_to_map = (data_chunks, blocks_map) => {
+            data_chunks = data_chunks.filter(x => typeof(x) === 'string');
+            data_chunks = data_chunks
+                .map(x => x.match(/.{1,8}/g)
+                    .map(y => y.match(/.{1,2}/g)
+                        .map(z => Number.parseInt(z, 16))));
+
+            for (const chunk of data_chunks) {
+                for (const m of chunk) {
+                    if (m.length == 4) {
+                        blocks_map.set(that.xyz_to_pos(m[0], m[1], m[2]), {
+                            "x": m[0],
+                            "y": m[1],
+                            "z": m[2],
+                            "c": m[3]
+                        });
+                    }
+                }
+            }
+        };
+
+
+        const extract_data_chunks_from_outputs = (out) => {
+            let data_chunks = [];
+
+            for (const j of out) {
+                if (j.s1 == 'craft') {
+                    if (typeof j.h3 !== 'undefined') {
+                        data_chunks.push(j.h3);
+                    }
+                }
+            }
+
+            return data_chunks;
+        };
 
         const find_more_blocks = (times_queried) => {
             $('#loading-status').text(`downloading blocks... ${times_queried*pagination_amount*51}`);
@@ -84,43 +119,14 @@ class World {
                 console.log(data);
                 let data_chunks = [];
                 for(const m of data.c) {
-                    for (const j of m.out) {
-                        if (j.s1 == 'craft') {
-                            if (typeof j.h3 !== 'undefined') {
-                                data_chunks.push(j.h3);
-                            }
-                        }
-                    }
+                    data_chunks.push(...extract_data_chunks_from_outputs(m.out));
                 }
 
                 for(const m of data.u) {
-                    for (const j of m.out) {
-                        if (j.s1 == 'craft') {
-                            if (typeof j.h3 !== 'undefined') {
-                                data_chunks.push(j.h3);
-                            }
-                        }
-                    }
+                    data_chunks.push(...extract_data_chunks_from_outputs(m.out));
                 }
 
-                data_chunks = data_chunks.filter(x => typeof(x) === 'string');
-                data_chunks = data_chunks
-                    .map(x => x.match(/.{1,8}/g)
-                        .map(y => y.match(/.{1,2}/g)
-                            .map(z => Number.parseInt(z, 16))));
-
-                for (const chunk of data_chunks) {
-                    for (const m of chunk) {
-                        if (m.length == 4) {
-                            blocks_map.set(that.xyz_to_pos(m[0], m[1], m[2]), {
-                                "x": m[0],
-                                "y": m[1],
-                                "z": m[2],
-                                "c": m[3]
-                            });
-                        }
-                    }
-                }
+                parse_data_chunks_to_map(data_chunks, blocks_map);
 
                 if (data.u.length + data.c.length < pagination_amount) {
                     add_blocks();
@@ -150,35 +156,10 @@ class World {
             }
 
             let data_chunks = [];
-            for (const j of data.data[0].out) {
-                if (j.s1 == 'craft') {
-                    if (typeof j.h3 !== 'undefined') {
-                        data_chunks.push(j.h3);
-                    }
-                }
-            }
-
+            data_chunks.push(...extract_data_chunks_from_outputs(data.data[0].out));
 
             let new_blocks_map = new Map();
-
-            data_chunks = data_chunks.filter(x => typeof(x) === 'string');
-            data_chunks = data_chunks
-                .map(x => x.match(/.{1,8}/g)
-                    .map(y => y.match(/.{1,2}/g)
-                        .map(z => Number.parseInt(z, 16))));
-
-            for (const chunk of data_chunks) {
-                for (const m of chunk) {
-                    if (m.length == 4) {
-                        new_blocks_map.set(that.xyz_to_pos(m[0], m[1], m[2]), {
-                            "x": m[0],
-                            "y": m[1],
-                            "z": m[2],
-                            "c": m[3]
-                        });
-                    }
-                }
-            }
+            parse_data_chunks_to_map(data_chunks, new_blocks_map);
 
             let chunk_update_set = new Set();
             let blocks = Array.from(new_blocks_map.values());
