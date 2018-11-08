@@ -305,6 +305,24 @@ class World {
         return chunkId;
     }
 
+    get_block_color(x, y, z) {
+        let pos      = this.xyz_to_pos(x, y, z);
+        let chunkId  = this.get_chunk_id(x, y, z);
+        let chunk    = this.get_chunk(chunkId);
+
+        if (chunk == null) {
+            return 0;
+        } else {
+            for(let i = 0; i < chunk.length; i++) {
+                if (chunk[i].pos == pos) {
+                    return chunk[i].color;
+                }
+            }
+
+            return 0;
+        }
+    }
+
     remove_block(x, y, z) {
         let pos      = this.xyz_to_pos(x, y, z);
         let chunkId  = this.get_chunk_id(x, y, z);

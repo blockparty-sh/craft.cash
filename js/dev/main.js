@@ -4,6 +4,15 @@
 //==============================================================================
 "use strict";
 
+class Undo {
+    constructor(x, y, z, old_c, new_c) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.old_c = old_c;
+        this.new_c = new_c;
+    }
+}
 class Game {
     constructor(tx_world, tx_block) {
         this.tx_world = tx_world;
@@ -23,6 +32,7 @@ class Game {
         this.block_buffer = new Map(); // what we'll serialize and send
         this.syncing = false; // currently syncing? dont place blocks 
         this.selected_color = 255;
+        this.undo_list = [];
 
         // Scene settings
         this.screenWidth = window.innerWidth;
@@ -80,9 +90,11 @@ class Game {
             return;
         }
 
-        if (game.block_buffer.size == 0) {
+        if (this.block_buffer.size == 0) {
             return;
         }
+
+        this.undo_list = [];
 
         console.log('sync');
         this.syncing = true;
@@ -232,6 +244,11 @@ class Game {
     init_keyboard_and_mouse() {
         let that = this;
         $(window).on('keydown', function(e) {
+            if (e.ctrlKey) {
+                e.preventDefault();
+                return;
+            }
+
             switch(e.key) {
                 case 'w': that.keys_pressed |= that.key_w; break;
                 case 'a': that.keys_pressed |= that.key_a; break;
@@ -243,6 +260,19 @@ class Game {
         });
         $(window).on('keyup',(e) => {
             const ms = 0.1;
+
+            if (e.ctrlKey) {
+                switch (e.key) {
+                    case 's':
+                        this.sync_changes();
+                        break;
+                    case 'z':
+                        this.undo();
+                        break;
+                }
+
+                return;
+            }
 
             switch(e.key) {
                 case 'w': that.keys_pressed ^= that.key_w; break;
@@ -265,15 +295,8 @@ class Game {
                 case 'o': this.controls.getObject().translateY(ms); break;
 
                 case 'c': this.show_color_chooser(); break;
-                case 'z': this.sync_changes(); break;
                 case 'h': show_help_modal(); break;
                 case 'H': $('#instructions').toggle(); break;
-            }
-
-            if (e.ctrlKey) {
-                switch (e.key) {
-                    case 'z': console.log('CTRLZ'); break;
-                }
             }
         });
 
@@ -521,6 +544,40 @@ class Game {
         return Math.sqrt(dx*dx+dy*dy+dz*dz);
     }
 
+    undo() {
+        // CTRL
+        if (this.undo_list.length == 0) {
+            return;
+        }
+
+        this.block_buffer = new Map();
+        let chunk_update_set = new Set();
+
+        let undos = this.undo_list.reverse();
+        for (const u of undos) {
+            this.world.remove_block(u.x, u.y, u.z);
+            if (u.old_c != 0) {
+                this.world.add_block(u.x, u.y, u.z, u.old_c);
+            }
+        }
+
+        undos.reverse(); // undo the above reverse
+        let final_undo = undos.pop();
+        chunk_update_set.add(this.world.get_chunk_id(final_undo.x, final_undo.y, final_undo.z));
+        for (const u of undos) {
+            chunk_update_set.add(this.world.get_chunk_id(u.x, u.y, u.z));
+            this.world.remove_block(u.x, u.y, u.z);
+            this.block_buffer.set(this.world.xyz_to_pos(u.x, u.y, u.z), u.new_c);
+
+            if (u.new_c > 0) {
+                this.world.add_block(u.x, u.y, u.z, u.new_c);
+            }
+        }
+
+        $('#block-changes-count').text(this.block_buffer.size);
+        [...chunk_update_set].forEach(id => this.world.rebuild_specific_chunk(id));
+    }
+
     render() {
         /*
         this.raycaster = new THREE.Raycaster();
@@ -575,17 +632,45 @@ class Game {
             let chunkId = null;
 
             const buf_pos = this.world.xyz_to_pos(bpos.x, bpos.y, bpos.z);
-            if(this.mouse.left && this.selected_color != 0) {
+
+            const undo = new Undo(
+                bpos.x, bpos.y, bpos.z,
+                this.world.get_block_color(bpos.x, bpos.y, bpos.z),
+                this.selected_color
+            );
+
+
+            const add_to_undo_list = (c) => {
+                undo.new_c = c;
+                if (this.undo_list.length == 0) {
+                    this.undo_list.push(undo);
+                } else {
+                    const u = this.undo_list[this.undo_list.length - 1];
+
+                    if ((u.x != undo.x || u.y != undo.y || u.z != undo.z)
+                    || (u.new_c != undo.new_c)) {
+                        console.log(undo);
+                        this.undo_list.push(undo);
+                    }
+                }
+            }
+
+            if (this.mouse.left
+            && this.world.get_block_color(bpos.x, bpos.y, bpos.z) != this.selected_color) {
+
                 this.world.remove_block(bpos.x, bpos.y, bpos.z);
                 chunkId = this.world.add_block(bpos.x, bpos.y, bpos.z, this.selected_color);
 
                 if(chunkId != null) {
                     this.block_buffer.set(buf_pos, this.selected_color);
                     $('#block-changes-count').text(this.block_buffer.size);
+
+                    add_to_undo_list(this.selected_color);
                 }
             }
 
-            if(this.mouse.right) {
+            if (this.mouse.right
+            && this.world.get_block_color(bpos.x, bpos.y, bpos.z) != 0) {
                 chunkId = this.world.remove_block(bpos.x, bpos.y, bpos.z);
 
                 if(chunkId != null) {
@@ -597,11 +682,13 @@ class Game {
                     }
 
                     $('#block-changes-count').text(this.block_buffer.size);
+
+                    add_to_undo_list(0);
                 }
             }
 
             if(chunkId != null) {
-                this.world.rebuild_specific_chunk(chunkId);
+              this.world.rebuild_specific_chunk(chunkId);
             }
         }
 
