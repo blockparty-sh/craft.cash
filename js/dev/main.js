@@ -695,6 +695,11 @@ class Game {
             if(chunkId != null) {
               this.world.rebuild_specific_chunk(chunkId);
             }
+
+            this.selector.material.visible = true;
+        } else {
+            // don't render selector when we can't place blocks here
+            this.selector.material.visible = false;
         }
 
         const spos = new THREE.Vector3(
