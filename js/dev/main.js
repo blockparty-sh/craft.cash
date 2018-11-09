@@ -614,11 +614,8 @@ class Game {
 
         const cobj = this.controls.getObject();
 
-        const cdir = new THREE.Vector3();
-        game.controls.getDirection(cdir);
-
-        const cpos = new THREE.Vector3(0, cdir.y, -1);
-        cpos.applyQuaternion(cobj.quaternion);
+        const cpos = new THREE.Vector3();
+        game.controls.getDirection(cpos);
         cpos.add(cobj.position);
 
         const bpos = new THREE.Vector3(
