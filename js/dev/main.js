@@ -651,7 +651,6 @@ class Game {
 
                     if ((u.x != undo.x || u.y != undo.y || u.z != undo.z)
                     || (u.new_c != undo.new_c)) {
-                        console.log(undo);
                         this.undo_list.push(undo);
                     }
                 }
