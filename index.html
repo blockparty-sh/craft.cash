@@ -380,11 +380,14 @@
                 };
 
 
-                blockparty.before('login', () => {
+				const clear_actions_pane = () => {
                     document
                         .querySelector('#blockparty-wallet #actions .collapsible')
                         .innerHTML = '';
-                });
+				};
+
+                blockparty.before('login', () => clear_actions_pane);
+                blockparty.before('update_actions', () => clear_actions_pane);
 
                 blockparty.init({
                     'bitdb_token': 'qp9rzh6levrrn5r5x4slc6q7qxhl452dty5nuyuq6m',
