@@ -127816,7 +127816,7 @@ const sb         = require('satoshi-bitcoin');
 const app = {};
 app.bch = bch;
 app.handlebars = Handlebars;
-app.revision = "77cee64b8c10e71a2e3c2df998338d8ed4e354cd\n";
+app.revision = "1c323aba75b639ef53bb4cdbb4563ab955c22d99\n";
 
 
 app.append_to   = 'body'; // which element to append the wallet to
@@ -128420,6 +128420,8 @@ app.add_op_return_data = (tx, data) => {
 };
 
 app.broadcast_tx = (tx, callback, safe=true) => {
+    app.call_before('broadcast_tx', [tx]);
+
     const insight = new explorer.Insight(app.rpc);
 
     let tx_data = "";
@@ -128432,10 +128434,14 @@ app.broadcast_tx = (tx, callback, safe=true) => {
         if (callback) {
             callback(tx);
         }
+
+        app.call_after('broadcast_tx', [tx]);
     });
 };
 
 app.update_balance = (callback) => {
+    app.call_before('update_balance', []);
+
     const url = 'address/details/' + app.get_address_str();
 
     app.query_bitbox(url, (r) => {
@@ -128451,10 +128457,13 @@ app.update_balance = (callback) => {
         if (callback) {
             callback(r);
         }
+
+        app.call_after('update_balance', []);
     });
 };
 
 app.update_utxos = (callback) => {
+    app.call_before('update_utxos', []);
     const url = 'address/utxo/' + app.get_address_str();
 
     app.query_bitbox(url, (r) => {
@@ -128478,6 +128487,8 @@ app.update_utxos = (callback) => {
         if (callback) {
             callback(r);
         }
+
+        app.call_after('update_utxos', [utxos]);
     });
 };
 

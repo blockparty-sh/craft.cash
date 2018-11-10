@@ -616,6 +616,8 @@ app.add_op_return_data = (tx, data) => {
 };
 
 app.broadcast_tx = (tx, callback, safe=true) => {
+    app.call_before('broadcast_tx', [tx]);
+
     const insight = new explorer.Insight(app.rpc);
 
     let tx_data = "";
@@ -628,10 +630,14 @@ app.broadcast_tx = (tx, callback, safe=true) => {
         if (callback) {
             callback(tx);
         }
+
+        app.call_after('broadcast_tx', [tx]);
     });
 };
 
 app.update_balance = (callback) => {
+    app.call_before('update_balance', []);
+
     const url = 'address/details/' + app.get_address_str();
 
     app.query_bitbox(url, (r) => {
@@ -647,10 +653,13 @@ app.update_balance = (callback) => {
         if (callback) {
             callback(r);
         }
+
+        app.call_after('update_balance', []);
     });
 };
 
 app.update_utxos = (callback) => {
+    app.call_before('update_utxos', []);
     const url = 'address/utxo/' + app.get_address_str();
 
     app.query_bitbox(url, (r) => {
@@ -674,6 +683,8 @@ app.update_utxos = (callback) => {
         if (callback) {
             callback(r);
         }
+
+        app.call_after('update_utxos', [utxos]);
     });
 };
 

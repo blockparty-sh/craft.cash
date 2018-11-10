@@ -65,6 +65,40 @@ Start a web server as shown above and open `http://127.0.0.1:8000/examples/memo.
 
 See `https://craft.cash` for an example of a full application built using the blockparty wallet. 
 
+
+## Using in Your Application
+
+#### Loading from blockparty.sh
+
+This will keep updated with the most recent version of the code. This can be easier way to use but it is probably better if you use the Git instruction below for stability and security reasons.
+
+Add the following to the `<head>` of your page for the development version:
+
+```html
+<link rel="stylesheet" href="https://blockparty.sh/wallet/dist/blockparty-wallet.css">
+<script src="https://blockparty.sh/wallet/dist/blockparty-wallet.js"></script>
+```
+
+Or the minified version:
+
+```html
+<link rel="stylesheet" href="https://blockparty.sh/wallet/dist/blockparty-wallet.min.css">
+<script src="https://blockparty.sh/wallet/dist/blockparty-wallet.min.js"></script>
+```
+
+
+#### Git (recommended)
+
+First you'll want to add this repo as a subtree. To do this run this command:
+
+`git subtree add --prefix wallet https://github.com/blockparty-sh/wallet master`
+
+Then, whenever you'd like to update the wallet just run this command
+
+`git pull -X theirs -s subtree https://github.com/blockparty-sh/wallet master`
+
+
+
 ## Methods
 
 
@@ -267,6 +301,9 @@ Registers a call to perform prior to performing a blockparty method. The valid m
 - `'login', (wif: string) => {}`
 - `'logout', () => {}`
 - `'send', (address: bch.Address, satoshis: integer) => {}`
+- `'broadcast_tx'`, (tx: bch.Transaction) => {}
+- `'update_balance'`, () => {}
+- `'update_utxos'`, () => {}
 
 
 ##### Example
@@ -284,6 +321,9 @@ Registers a call to perform after performing a blockparty method. The valid meth
 - `'login', (wif: string) => {}`
 - `'logout', () => {}`
 - `'send', (address: bch.Address, satoshis: integer, tx: bch.Transaction) => {}`
+- `'broadcast_tx'`, (tx: bch.Transaction) => {}
+- `'update_balance'`, () => {}
+- `'update_utxos'`, (utxos: [object]) => {}
 
 ##### Example
 ```js
