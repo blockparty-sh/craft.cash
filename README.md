@@ -267,6 +267,9 @@ Registers a call to perform prior to performing a blockparty method. The valid m
 - `'login', (wif: string) => {}`
 - `'logout', () => {}`
 - `'send', (address: bch.Address, satoshis: integer) => {}`
+- `'broadcast_tx'`, (tx: bch.Transaction) => {}
+- `'update_balance'`, () => {}
+- `'update_utxos'`, () => {}
 
 
 ##### Example
@@ -284,6 +287,9 @@ Registers a call to perform after performing a blockparty method. The valid meth
 - `'login', (wif: string) => {}`
 - `'logout', () => {}`
 - `'send', (address: bch.Address, satoshis: integer, tx: bch.Transaction) => {}`
+- `'broadcast_tx'`, (tx: bch.Transaction) => {}
+- `'update_balance'`, () => {}
+- `'update_utxos'`, (utxos: [object]) => {}
 
 ##### Example
 ```js
