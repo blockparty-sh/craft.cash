@@ -60,6 +60,8 @@
         <script src="js/postprocessing/TexturePass.js"></script>
         <script src="js/postprocessing/UnrealBloomPass.js"></script>
 
+        <script src="https://www.moneybutton.com/moneybutton.js"></script>
+
         <link rel="stylesheet" href="wallet/dist/blockparty-wallet.css">
 
         <style>
@@ -226,6 +228,10 @@
             z-index:100;
             text-align:left;
         }
+		#money-button-container {
+			width: auto;
+			margin:0 auto;
+		}
 
         </style>
     </head>
@@ -263,6 +269,19 @@
             h to show this help pane<br>
             H to toggle showing instructions in corner<br>
             </p>
+			<br>
+			<div id="money-button-container">
+				<div class="money-button"
+				  data-to="1153"
+				  data-amount="0.01"
+				  data-currency="BCH"
+				  data-label="Donate"
+				  data-client-identifier="06c05983a28077c6c0f2ae4b434c63c7"
+				  data-button-id="1541885166838"
+				  data-button-data="{}"
+				  data-type="tip"
+				></div>
+			</div>
         </div>
         <div style="position: relative; z-index: 1; " id="container"></div> 
         <div style="position: absolute; z-index: 100;" id="stats"></div>
