@@ -127816,7 +127816,7 @@ const sb         = require('satoshi-bitcoin');
 const app = {};
 app.bch = bch;
 app.handlebars = Handlebars;
-app.revision = "1c323aba75b639ef53bb4cdbb4563ab955c22d99\n";
+app.revision = "546645079373ec3b0d91eef326c2179c8e036aeb\n";
 
 
 app.append_to   = 'body'; // which element to append the wallet to
@@ -128543,6 +128543,7 @@ app.registered_actions_parsers.push((tx, confirmed) => {
 });
 
 app.update_actions = (callback) => {
+    app.call_before('update_actions', []);
     app.query_bitdb(app.update_actions_query(), (r) => {
         for (const tx of r.u) {
             for (const parser of app.registered_actions_parsers) {
@@ -128559,6 +128560,8 @@ app.update_actions = (callback) => {
         if (callback) {
             callback(r);
         }
+
+        app.call_after('update_actions', []);
     });
 };
 
