@@ -304,6 +304,7 @@ Registers a call to perform prior to performing a blockparty method. The valid m
 - `'broadcast_tx'`, (tx: bch.Transaction) => {}
 - `'update_balance'`, () => {}
 - `'update_utxos'`, () => {}
+- `'update_actions'`, () => {}
 
 
 ##### Example
@@ -324,6 +325,7 @@ Registers a call to perform after performing a blockparty method. The valid meth
 - `'broadcast_tx'`, (tx: bch.Transaction) => {}
 - `'update_balance'`, () => {}
 - `'update_utxos'`, (utxos: [object]) => {}
+- `'update_actions'`, () => {}
 
 ##### Example
 ```js
