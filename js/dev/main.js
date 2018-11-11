@@ -33,6 +33,7 @@ class Game {
         this.syncing = false; // currently syncing? dont place blocks 
         this.color_picker = false; // enabled by keyboard to grab color
         this.selected_color = 255;
+        this.undo_pressed_count = 0;
         this.undo_list = [];
 
         // Scene settings
@@ -260,11 +261,14 @@ class Game {
 
     init_keyboard_and_mouse() {
         let that = this;
-        $(window).on('keydown', function(e) {
+        $(window).on('keydown', (e) => {
             if (e.ctrlKey) {
                 switch (e.key) {
                     case 's':
+                        e.preventDefault();
+                        break;
                     case 'z':
+                        that.undo_pressed_count++;
                         e.preventDefault();
                         break;
                 }
@@ -287,10 +291,11 @@ class Game {
             if (e.ctrlKey) {
                 switch (e.key) {
                     case 's':
-                        this.sync_changes();
+                        that.sync_changes();
                         break;
                     case 'z':
-                        this.undo();
+                        that.undo_pressed_count = 0;
+                        that.undo();
                         break;
                 }
 
@@ -305,22 +310,23 @@ class Game {
                 case 'q': that.keys_pressed ^= that.key_q; break;
                 case 'e': that.keys_pressed ^= that.key_e; break;
 
-                case 'i': this.controls.getObject().translateZ(-ms); break;
-                case 'k': this.controls.getObject().translateZ(ms); break;
-                case 'j': this.controls.getObject().translateX(-ms); break;
-                case 'l': this.controls.getObject().translateX(ms); break;
+                case 'i': that.controls.getObject().translateZ(-ms); break;
+                case 'k': that.controls.getObject().translateZ(ms); break;
+                case 'j': that.controls.getObject().translateX(-ms); break;
+                case 'l': that.controls.getObject().translateX(ms); break;
                 case 'u': {
-                    if(this.controls.getObject().position.y > 1) {
-                        this.controls.getObject().translateY(-ms);
+                    if (that.controls.getObject().position.y > 1) {
+                        that.controls.getObject().translateY(-ms);
                     }
                     break;
                 }
-                case 'o': this.controls.getObject().translateY(ms); break;
+                case 'o': that.controls.getObject().translateY(ms); break;
 
-                case 'c': this.toggle_color_chooser(); break;
+                case 'c': that.toggle_color_chooser(); break;
                 case 'C': that.color_picker = false; break;
                 case 'h': show_help_modal(); break;
                 case 'H': $('#instructions').toggle(); break;
+                case 'z': that.undo_pressed_count = 0; break;
             }
         });
 
@@ -645,7 +651,6 @@ class Game {
             (cpos.z / this.world.bs) | 0
         );
 
-        // we cant add blocks while syncing or out of world area
         if (! this.syncing && this.tx_block === 100000000
          && this.controls.enabled // dont add block if just clicking from outside pointerlock
          && bpos.x >= 0 && bpos.x < this.world.ws
@@ -734,15 +739,24 @@ class Game {
         // this.selector.applyQuaternion(cobj.quaternion);
         this.selector.position.copy(spos);
 
-        if (time | 0 % 100 == 0) {
-            const ms = 0.04;
-            if (this.keys_pressed & this.key_w) { this.controls.getObject().translateZ(-ms); }
-            if (this.keys_pressed & this.key_s) { this.controls.getObject().translateZ(ms);  }
-            if (this.keys_pressed & this.key_a) { this.controls.getObject().translateX(-ms); }
-            if (this.keys_pressed & this.key_d) { this.controls.getObject().translateX(ms);  }
-            if (this.keys_pressed & this.key_q) { if(cobj.position.y > 1) this.controls.getObject().translateY(-ms); }
-            if (this.keys_pressed & this.key_e) { this.controls.getObject().translateY(ms);  }
+
+        if (this.undo_pressed_count > 0) {
+            this.undo_pressed_count++;
+
+            if ((time*1000 | 0) % 1000 < 100) {
+                if ((this.undo_pressed_count / 80)|0 > 0) {
+                    this.undo();
+                }
+            }
         }
+
+        const ms = 0.04;
+        if (this.keys_pressed & this.key_w) { this.controls.getObject().translateZ(-ms); }
+        if (this.keys_pressed & this.key_s) { this.controls.getObject().translateZ(ms);  }
+        if (this.keys_pressed & this.key_a) { this.controls.getObject().translateX(-ms); }
+        if (this.keys_pressed & this.key_d) { this.controls.getObject().translateX(ms);  }
+        if (this.keys_pressed & this.key_q) { if(cobj.position.y > 1) this.controls.getObject().translateY(-ms); }
+        if (this.keys_pressed & this.key_e) { this.controls.getObject().translateY(ms);  }
 
         this.draw_water(time);
         this.stats.update();
