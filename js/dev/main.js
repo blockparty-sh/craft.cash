@@ -84,6 +84,12 @@ class Game {
         }
     }
 
+    update_footer_counts() {
+        $('#block-changes-count').text(game.block_buffer.size);
+        const txs_remaining = (blockparty.get_balance() + blockparty.get_unconfirmed_balance()) / 1000. | 0;
+        $('#wallet-blocks-remaining').text((txs_remaining*51) - game.block_buffer.size);
+    }
+
     sync_changes() {
         if (! blockparty.is_logged_in()) {
             window.alert('you must login to wallet to sync');
@@ -106,7 +112,7 @@ class Game {
         this.syncing = true;
         $('#loading-status').show();
         $('#loading-status').text(`syncing (${game.block_buffer.size} remaining)`);
-        $('#block-changes-count').text(game.block_buffer.size);
+        this.update_footer_counts();
 
         let serialized_block_buf = "";
 
@@ -178,7 +184,7 @@ class Game {
             setTimeout(() => {
                 blockparty.update_balance(blockparty.update_balance_html);
                 blockparty.update_utxos(() => {
-                    $('#block-changes-count').text(that.block_buffer.size);
+                    that.update_footer_counts();
                     if (game.block_buffer.size > 0) {
                         game.sync_changes();
                     } else {
@@ -594,7 +600,7 @@ class Game {
             }
         }
 
-        $('#block-changes-count').text(this.block_buffer.size);
+        this.update_footer_counts();
         [...chunk_update_set].forEach(id => this.world.rebuild_specific_chunk(id));
     }
 
@@ -685,7 +691,7 @@ class Game {
 
                     if(chunkId != null) {
                         this.block_buffer.set(buf_pos, this.selected_color);
-                        $('#block-changes-count').text(this.block_buffer.size);
+                        this.update_footer_counts();
 
                         add_to_undo_list(this.selected_color);
                     }
@@ -703,7 +709,7 @@ class Game {
                             this.block_buffer.set(buf_pos, 0); // 0 color for delete
                         }
 
-                        $('#block-changes-count').text(this.block_buffer.size);
+                        this.update_footer_counts();
 
                         add_to_undo_list(0);
                     }

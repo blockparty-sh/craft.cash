@@ -292,6 +292,7 @@
         <div id="footer">
             <a href="#" onclick="show_help_modal()">help</a> |
             <span id="block-changes-count">0</span> blocks remaining to sync | 
+            about <span id="wallet-blocks-remaining">0</span> craft blocks remaining | 
             <a href="https://github.com/blockparty-sh/craft.cash" target="_blank">github repo</a>
         </div>
 
@@ -405,10 +406,10 @@
                     document
                         .querySelector('#blockparty-wallet #actions .collapsible')
                         .innerHTML = '';
-					console.error('clear_actions_pane');
 				};
 
                 blockparty.before('login', () => clear_actions_pane());
+                blockparty.after('login', () => game.update_footer_counts());
                 blockparty.before('update_actions', () => clear_actions_pane());
 
                 blockparty.init({
