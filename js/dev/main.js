@@ -31,6 +31,7 @@ class Game {
         this.mouse;
         this.block_buffer = new Map(); // what we'll serialize and send
         this.syncing = false; // currently syncing? dont place blocks 
+        this.color_picker = false; // enabled by keyboard to grab color
         this.selected_color = 255;
         this.undo_list = [];
 
@@ -68,14 +69,19 @@ class Game {
         this.scene.add(this.camera);
     }
 
-    show_color_chooser() {
-        $('#color-chooser').show();
+    toggle_color_chooser() {
+        $('#color-chooser').toggle();
         $('#selected-color').hide();
-        document.exitPointerLock = document.exitPointerLock    ||
-                                   document.mozExitPointerLock;
-        document.exitPointerLock();
+        if ($('#color-chooser').is(':visible')) {
+            document.exitPointerLock = document.exitPointerLock    ||
+                                       document.mozExitPointerLock;
+            document.exitPointerLock();
 
-        $('#color-chooser').focus();
+            $('#color-chooser').focus();
+        } else {
+            $('canvas').focus();
+            document.body.requestPointerLock();
+        }
     }
 
     sync_changes() {
@@ -200,22 +206,27 @@ class Game {
 
         let that = this;
         $('.color-choice').click((e) => {
-            $('.color-choice').removeClass('selected');
-            $(e.target).addClass('selected');
             const color_id = $(e.target).data('colorid') | 0;
-            let color = game.world.byte_to_rgb(color_id);
-            let html_color = "rgb(" + color.r + "," + color.g + ", " + color.b + ")";
-            that.selected_color = color_id;
-
+            that.change_selected_color(color_id);
             $('#color-chooser').hide();
-            $('#selected-color').css('background-color', html_color);
-            $('#selected-color').css('animation', 'none');
-            $('#selected-color').show();
-
             document.body.requestPointerLock();
         });
 
-        $('#selected-color').click(this.show_color_chooser);
+        $('#selected-color').click(this.toggle_color_chooser);
+    }
+
+    change_selected_color(id) {
+        $('.color-choice').removeClass('selected');
+        $('.color-choice:nth-child('+(id)+')').addClass('selected');
+        this.selected_color = id;
+
+        $('#color-chooser').hide();
+
+        const color = game.world.byte_to_rgb(id);
+        const html_color = "rgb(" + color.r + "," + color.g + ", " + color.b + ")";
+        $('#selected-color').css('background-color', html_color);
+        $('#selected-color').css('animation', 'none');
+        $('#selected-color').show();
     }
 
     init_selector() {
@@ -261,6 +272,7 @@ class Game {
                 case 'd': that.keys_pressed |= that.key_d; break;
                 case 'q': that.keys_pressed |= that.key_q; break;
                 case 'e': that.keys_pressed |= that.key_e; break;
+                case 'C': that.color_picker = true; break;
             }
         });
         $(window).on('keyup',(e) => {
@@ -299,7 +311,8 @@ class Game {
                 }
                 case 'o': this.controls.getObject().translateY(ms); break;
 
-                case 'c': this.show_color_chooser(); break;
+                case 'c': this.toggle_color_chooser(); break;
+                case 'C': that.color_picker = false; break;
                 case 'h': show_help_modal(); break;
                 case 'H': $('#instructions').toggle(); break;
             }
@@ -456,6 +469,7 @@ class Game {
              || document.body.mozRequestPointerLock
              || document.body.webkitRequestPointerLock);
             $('#help-modal').hide();
+            $('#color-chooser').hide();
             document.body.requestPointerLock();
         }, false);
     }
@@ -488,6 +502,7 @@ class Game {
         this.world = new World();
         this.world.init();
 
+        this.change_selected_color(this.selected_color); // update html
         this.init_lights();
         this.init_controls();
         this.init_keyboard_and_mouse();
@@ -656,35 +671,42 @@ class Game {
                 }
             }
 
-            if (this.mouse.left
-            && this.world.get_block_color(bpos.x, bpos.y, bpos.z) != this.selected_color) {
-
-                this.world.remove_block(bpos.x, bpos.y, bpos.z);
-                chunkId = this.world.add_block(bpos.x, bpos.y, bpos.z, this.selected_color);
-
-                if(chunkId != null) {
-                    this.block_buffer.set(buf_pos, this.selected_color);
-                    $('#block-changes-count').text(this.block_buffer.size);
-
-                    add_to_undo_list(this.selected_color);
+            if (this.color_picker) {
+                const c = this.world.get_block_color(bpos.x, bpos.y, bpos.z);
+                if (c > 0) {
+                    this.change_selected_color(c);
                 }
-            }
+            } else {
+                if (this.mouse.left
+                && this.world.get_block_color(bpos.x, bpos.y, bpos.z) != this.selected_color) {
 
-            if (this.mouse.right
-            && this.world.get_block_color(bpos.x, bpos.y, bpos.z) != 0) {
-                chunkId = this.world.remove_block(bpos.x, bpos.y, bpos.z);
+                    this.world.remove_block(bpos.x, bpos.y, bpos.z);
+                    chunkId = this.world.add_block(bpos.x, bpos.y, bpos.z, this.selected_color);
 
-                if(chunkId != null) {
-                    // delete from our block_buffer if we added it first
-                    if(this.block_buffer.has(buf_pos)) {
-                        this.block_buffer.delete(buf_pos);
-                    } else {
-                        this.block_buffer.set(buf_pos, 0); // 0 color for delete
+                    if(chunkId != null) {
+                        this.block_buffer.set(buf_pos, this.selected_color);
+                        $('#block-changes-count').text(this.block_buffer.size);
+
+                        add_to_undo_list(this.selected_color);
                     }
+                }
 
-                    $('#block-changes-count').text(this.block_buffer.size);
+                if (this.mouse.right
+                && this.world.get_block_color(bpos.x, bpos.y, bpos.z) != 0) {
+                    chunkId = this.world.remove_block(bpos.x, bpos.y, bpos.z);
 
-                    add_to_undo_list(0);
+                    if(chunkId != null) {
+                        // delete from our block_buffer if we added it first
+                        if(this.block_buffer.has(buf_pos)) {
+                            this.block_buffer.delete(buf_pos);
+                        } else {
+                            this.block_buffer.set(buf_pos, 0); // 0 color for delete
+                        }
+
+                        $('#block-changes-count').text(this.block_buffer.size);
+
+                        add_to_undo_list(0);
+                    }
                 }
             }
 
