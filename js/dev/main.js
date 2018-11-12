@@ -415,7 +415,7 @@ class Game {
         dirLight.castShadow = true;
 
         dirLight.shadow.mapSize.width = 2048;
-        dirLight.shadow.mapSize.wheight = 2048;
+        dirLight.shadow.mapSize.height = 2048;
 
         let d = 150;
 
