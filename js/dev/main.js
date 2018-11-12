@@ -452,7 +452,7 @@ class Game {
     init_renderer() {
         this.renderer = new THREE.WebGLRenderer({antialias: false});
         this.renderer.setSize(this.screenWidth, this.screenHeight);
-        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.enabled = false;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.renderer.setClearColor(0x333333, 1);
     }
