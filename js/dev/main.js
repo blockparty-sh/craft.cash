@@ -406,7 +406,7 @@ class Game {
         hemiLight.position.set(0, 500, 0);
         this.scene.add(hemiLight);
 
-        let dirLight = new THREE.DirectionalLight(0xffffff, 1);
+        let dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
         dirLight.color.setHSL(0.1, 1, 0.95);
         dirLight.position.set(10, 100.75, 10);
         dirLight.position.multiplyScalar(10);
