@@ -7,6 +7,7 @@ const bip39      = require('bip39');
 const bch        = require('bitcore-lib-cash');
 const explorer   = require('bitcore-explorers');
 const sb         = require('satoshi-bitcoin');
+const bchaddr    = require('bchaddrjs');
 
 
 const app = {};
@@ -19,7 +20,6 @@ app.append_to   = 'body'; // which element to append the wallet to
 app.bitdb_token = '';     // enter token from https://bitdb.network/v3/dashboard
 app.bitdb_url   = 'https://bitdb.network/q/';
 app.bitsocket_url = 'https://bitsocket.org/s/';
-app.bitbox_url  = 'https://rest.bitbox.earth/v1/';
 
 app.wallet_template          = fs.readFileSync(__dirname + '/templates/wallet.html', 'utf-8');
 app.action_received_template = fs.readFileSync(__dirname + '/templates/action_received.html', 'utf-8');
@@ -42,7 +42,7 @@ app.default_bitsocket_listener = () => {
             if (r.type == 'mempool') {
                 const txid = r.data[0].tx.h;
                 let sats = 0;
-                for (let j of r.data[0].out) {
+                for (const j of r.data[0].out) {
                     if (j.e.a == blockparty.get_address_suffix()) {
                         sats += j.e.v;
                     }
@@ -62,12 +62,13 @@ app.default_bitsocket_listener = () => {
 };
 
 
-
 app.init = (options = {}) => {
     // overwrite any variables in app passed from options
     for (const o of Object.entries(options)) {
         app[o[0]] = o[1];
     }
+
+    app.insight = new explorer.Insight(app.rpc);
 
     // compile templates
     app.wallet_template          = app.handlebars.compile(app.wallet_template);
@@ -257,7 +258,7 @@ app.init = (options = {}) => {
         if (app.mnemonic_import_str_el.value != '') {
             wif = app.import_mnemonic(app.mnemonic_import_str_el.value);
         }
-        
+
         if (app.wif_import_str_el.value != '') {
             wif = app.import_wif(app.wif_import_str_el.value);
         }
@@ -295,7 +296,7 @@ app.init = (options = {}) => {
 };
 
 app.received_transaction = (txid, satoshis) =>  {
-    app.received_amount_el.innerText = "+" + app.sat2bch(satoshis) + " BCH";
+    app.received_amount_el.innerText = `+${app.sat2bch(satoshis)} BCH`;
     app.received_amount_el.setAttribute('href',
         app.tx_link_url_mapper(txid)
     );
@@ -355,6 +356,9 @@ app.call_after = (method, args) => {
 app.sat2bch = (sat) => sb.toBitcoin(sat);
 app.bch2sat = (bch) => sb.toSatoshi(bch)|0;
 
+app.to_legacy_address = (addr) => bchaddr.toLegacyAddress(addr);
+app.to_cash_address = (addr) => bchaddr.toCashAddress(addr);
+
 app.hide = () => {
     document.getElementById('blockparty-wallet').style.display = 'none';
 };
@@ -374,25 +378,10 @@ app.is_logged_in    = () => !!app.get_wif();
 app.is_minimized    = () => localStorage.getItem('blockparty-wallet.minimized') === 'true';
 app.get_private_key = () => new bch.PrivateKey(app.get_wif());
 app.get_address     = () => app.get_private_key().toAddress();
-app.get_address_str = () => app.get_address().toString(bch.Address.CashAddrFormat);
+app.get_address_str = () => app.get_address().toString();
+app.get_legacy_address_str = () => app.to_legacy_address(app.get_address_str());
 app.get_address_suffix = () => app.get_address_str().split('bitcoincash:')[1];
-app.get_utxos = () => {
-    const l_utxos = JSON.parse(localStorage.getItem('blockparty-wallet.utxo'));
-    const utxos = [];
-
-    for (const u of l_utxos) {
-        utxos.push({
-            'txId'        : u['txid'],
-            'outputIndex' : u['vout'],
-            'address'     : u['address'],
-            'script'      : u['script'],
-            'satoshis'    : u['satoshis'],
-        });
-    }
-
-    return utxos;
-};
-
+app.get_utxos = () => JSON.parse(localStorage.getItem('blockparty-wallet.utxo'));
 
 app.update_balance_html = () => {
     app.balance_amnt_el
@@ -430,7 +419,7 @@ app.generate_qr_code = (address) => {
     const error_correction_level = 'H';
 
     const qr = qrcode(type_number, error_correction_level);
-    qr.addData(address.toString(bch.Address.CashAddrFormat));
+    qr.addData(app.to_cash_address(address.toString()));
     qr.make();
 
     app.call_after('generate_qr_code', [address, qr]);
@@ -462,7 +451,7 @@ app.generate_address = () => {
     const hash     = bch.crypto.Hash.sha256(seed);
     const bn       = bch.crypto.BN.fromBuffer(hash);
     const key      = new bch.PrivateKey(bn);
-    const address  = key.toAddress().toString(bch.Address.CashAddrFormat);
+    const address  = app.to_cash_address(key.toAddress().toString());
 
     return {
         'address':  address,
@@ -486,7 +475,7 @@ app.import_mnemonic = (mnemonic) => {
 };
 
 app.import_wif = (wif) => {
-    // todo: allow uncompressed wifs 
+    // todo: allow uncompressed wifs
     // todo: perform better checking of validity
 
     if (wif.length != 52) {
@@ -500,7 +489,7 @@ app.import_wif = (wif) => {
     }
 
     return wif;
-}
+};
 
 app.login = (wif, callback) => {
     app.call_before('login', [wif]);
@@ -582,8 +571,8 @@ app.send = (address, satoshis, callback) => {
 };
 
 app.clean_tx_dust = (tx) => {
-	for (let i=0; i<tx.outputs.length; ++i) {
-		if (tx.outputs[i]._satoshis > 0 && tx.outputs[i]._satoshis < 546) {
+    for (let i=0; i<tx.outputs.length; ++i) {
+        if (tx.outputs[i]._satoshis > 0 && tx.outputs[i]._satoshis < 546) {
             tx.outputs.splice(i, 1);
             --i;
         }
@@ -593,14 +582,14 @@ app.clean_tx_dust = (tx) => {
 };
 
 app.add_op_return_data = (tx, data) => {
-    let script = new bch.Script();
+    const script = new bch.Script();
 
     script.add(bch.Opcode.OP_RETURN);
 
-    for (let m of data) {
+    for (const m of data) {
         if (m['type'] == 'hex') {
             script.add(Buffer.from(m['v'], 'hex'));
-        } else if(m['type'] == 'str') {
+        } else if (m['type'] == 'str') {
             script.add(Buffer.from(m['v']));
         } else {
             throw new Error('unknown data type');
@@ -615,76 +604,96 @@ app.add_op_return_data = (tx, data) => {
     return tx;
 };
 
-app.broadcast_tx = (tx, callback, safe=true) => {
+app.broadcast_tx = (tx, callback, err_callback, options = {
+    safe:    true, // check serialization
+    testing: false // if true dont actually broadcast to network
+}) => {
     app.call_before('broadcast_tx', [tx]);
 
-    const insight = new explorer.Insight(app.rpc);
-
-    let tx_data = "";
-    if (safe) {
+    let tx_data = '';
+    if (options.safe) {
         tx_data = tx.serialize();
     } else {
-        tx_data = tx.toString();
+        tx_data = tx.uncheckedSerialize();
     }
-    insight.broadcast(tx_data, () => {
+
+    if (options.testing) {
         if (callback) {
             callback(tx);
         }
 
         app.call_after('broadcast_tx', [tx]);
-    });
+    } else {
+        app.insight.broadcast(tx_data, (err, res) => {
+            if (err) {
+                err_callback(err);
+            } else {
+                if (callback) {
+                    callback(tx);
+                }
+
+                app.call_after('broadcast_tx', [tx]);
+            }
+        });
+    }
 };
 
-app.update_balance = (callback) => {
+app.update_balance = (callback, err_callback = (err) => {
+    console.error(err);
+}) => {
     app.call_before('update_balance', []);
 
-    const url = 'address/details/' + app.get_address_str();
+    app.insight.address(app.get_legacy_address_str(), (err, addr_info) => {
+        if (err) {
+            err_callback(err);
+        } else {
+            localStorage.setItem('blockparty-wallet.balance',
+                                 addr_info['balance']);
+            localStorage.setItem('blockparty-wallet.unconfirmed-balance',
+                                 addr_info['unconfirmedBalance']);
+            localStorage.setItem('blockparty-wallet.total-sent',
+                                 addr_info['totalSent']);
+            localStorage.setItem('blockparty-wallet.total-received',
+                                 addr_info['totalReceived']);
 
-    app.query_bitbox(url, (r) => {
-        localStorage.setItem('blockparty-wallet.balance',
-                             r['balanceSat']);
-        localStorage.setItem('blockparty-wallet.unconfirmed-balance',
-                             r['unconfirmedBalanceSat']);
-        localStorage.setItem('blockparty-wallet.total-sent',
-                             r['totalSentSat']);
-        localStorage.setItem('blockparty-wallet.total-received',
-                             r['totalReceivedSat']);
+            if (callback) {
+                callback(addr_info);
+            }
 
-        if (callback) {
-            callback(r);
+            app.call_after('update_balance', []);
         }
-
-        app.call_after('update_balance', []);
     });
 };
 
-app.update_utxos = (callback) => {
+app.update_utxos = (callback, err_callback = (err) => {
+    console.error(err);
+}) => {
     app.call_before('update_utxos', []);
-    const url = 'address/utxo/' + app.get_address_str();
 
-    app.query_bitbox(url, (r) => {
-        const utxos = [];
-        for (const m of r) {
-            utxos.push({
-                txid:     m['txid'],
-                satoshis: m['satoshis'],
-                script:   m['scriptPubKey'],
-                vout:     m['vout'],
-                address:  m['cashAddress'],
-            });
+    app.insight.getUnspentUtxos(app.get_legacy_address_str(), (err, utxo_info) => {
+        if (err) {
+            err_callback(err);
+        } else {
+            const utxos = JSON.parse(JSON.stringify(utxo_info)).map((v) => ({
+                txId:        v['txid'],
+                outputIndex: v['vout'],
+                address:     app.to_cash_address(v['address']),
+                script:      v['scriptPubKey'],
+                satoshis:    app.bch2sat(v['amount']),
+            }));
+
+            utxos.sort((a, b) => (a.satoshis > b.satoshis) ?  1
+                              : ((a.satoshis < b.satoshis) ? -1
+                              : 0));
+
+            localStorage.setItem('blockparty-wallet.utxo', JSON.stringify(utxos));
+
+            if (callback) {
+                callback(r);
+            }
+
+            app.call_after('update_utxos', [utxos]);
         }
-
-        utxos.sort((a, b) => (a.satoshis > b.satoshis) ?  1
-                          : ((a.satoshis < b.satoshis) ? -1
-                          : 0));
-
-        localStorage.setItem('blockparty-wallet.utxo', JSON.stringify(utxos));
-
-        if (callback) {
-            callback(r);
-        }
-
-        app.call_after('update_utxos', [utxos]);
     });
 };
 
@@ -701,21 +710,21 @@ app.registered_actions_parsers.push((tx, confirmed) => {
         date_string = `${date.getMonth()}/${date.getDate()}/${1900+date.getYear()}`;
     }
     let amount = 0;
-    let type = "";
+    let type = '';
 
     for (const j of tx.in) {
         if (j.e.a == address) {
-            type = "sent";
+            type = 'sent';
             for (const j of tx.out) {
-                if('bitcoincash:'+j.e.a != app.get_address_str()) {
+                if ('bitcoincash:'+j.e.a != app.get_address_str()) {
                     amount += j.e.v;
                 }
             }
             break;
         } else {
-            type = "receive";
+            type = 'receive';
             for (const j of tx.out) {
-                if(j.e.a == address) {
+                if (j.e.a == address) {
                     amount = j.e.v;
                     break;
                 }
@@ -761,18 +770,6 @@ app.update_actions = (callback) => {
     });
 };
 
-app.query_bitbox = (route, callback) => {
-    const header = {
-        headers: {},
-    };
-
-    const url = app.bitbox_url + route;
-
-    fetch(url, header)
-        .then((r) => r.json())
-        .then(callback);
-};
-
 app.query_bitdb = (q, callback) => {
     if (app.bitdb_token === '') {
         window.alert('bitdb_token option not set');
@@ -799,7 +796,8 @@ app.initialize_bitsocket_listener = (q, callback) => {
     const socket = new EventSource(url);
     socket.onmessage = (e) => {
         callback(JSON.parse(e.data));
-    }
+    };
+
     return socket;
 };
 
