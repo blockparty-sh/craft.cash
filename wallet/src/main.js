@@ -689,7 +689,7 @@ app.update_utxos = (callback, err_callback = (err) => {
             localStorage.setItem('blockparty-wallet.utxo', JSON.stringify(utxos));
 
             if (callback) {
-                callback(r);
+                callback(utxo_info);
             }
 
             app.call_after('update_utxos', [utxos]);
