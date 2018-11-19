@@ -251,6 +251,7 @@
         </div>
         <div id="help-modal">
             <h1>craft.cash (WIP)</h1>
+            <h2>switch to <a id="fork-link" href="">SV fork</a></h2>
             <p>
             craft.cash is a voxel drawing program implemented on the bitcoin cash blockchain.<br>
             it is powered by the <a href="https://blockparty.sh" target="_blank">blockparty wallet</a>.<br>
@@ -413,6 +414,12 @@
                 blockparty.before('update_actions', () => clear_actions_pane());
 
                 const fork          = get_url_param('fork', 'abc');
+                $('#fork-link').attr('href', '/?fork=' + ((fork == 'abc') ? 'sv' : 'abc'));
+                $('#fork-link').text((fork == 'abc') ? 'SV fork' : 'ABC fork');
+                if (fork != 'sv') {
+                    $('#money-button-container').hide();
+                }
+
                 const bitdb_url     = (fork == 'abc') ? 'https://bitdb.network/q/'
                                                       : 'https://bitgraph.network/q/';
                 const bitsocket_url = (fork == 'abc') ? 'https://bitsocket.org/s/'
