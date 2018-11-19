@@ -130192,7 +130192,7 @@ const bchaddr    = require('bchaddrjs');
 const app = {};
 app.bch = bch;
 app.handlebars = Handlebars;
-app.revision = "2001a9d2a01e01692db08466c2b2da05fca12f4a\n";
+app.revision = "5f68b6c0507c02eed994ebf0e9494c1e3e4a1b7b\n";
 
 
 app.append_to   = 'body'; // which element to append the wallet to
@@ -130868,7 +130868,7 @@ app.update_utxos = (callback, err_callback = (err) => {
             localStorage.setItem('blockparty-wallet.utxo', JSON.stringify(utxos));
 
             if (callback) {
-                callback(r);
+                callback(utxo_info);
             }
 
             app.call_after('update_utxos', [utxos]);
