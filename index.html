@@ -228,10 +228,10 @@
             z-index:100;
             text-align:left;
         }
-		#money-button-container {
-			width: auto;
-			margin:0 auto;
-		}
+        #money-button-container {
+            width: auto;
+            margin:0 auto;
+        }
 
         </style>
     </head>
@@ -271,19 +271,19 @@
             h to show this help pane<br>
             H to toggle showing instructions in corner<br>
             </p>
-			<br>
-			<div id="money-button-container">
-				<div class="money-button"
-				  data-to="1153"
-				  data-amount="0.01"
-				  data-currency="BCH"
-				  data-label="Donate"
-				  data-client-identifier="06c05983a28077c6c0f2ae4b434c63c7"
-				  data-button-id="1541885166838"
-				  data-button-data="{}"
-				  data-type="tip"
-				></div>
-			</div>
+            <br>
+            <div id="money-button-container">
+                <div class="money-button"
+                  data-to="1153"
+                  data-amount="0.01"
+                  data-currency="BCH"
+                  data-label="Donate"
+                  data-client-identifier="06c05983a28077c6c0f2ae4b434c63c7"
+                  data-button-id="1541885166838"
+                  data-button-data="{}"
+                  data-type="tip"
+                ></div>
+            </div>
         </div>
         <div style="position: relative; z-index: 1; " id="container"></div> 
         <div style="position: absolute; z-index: 100;" id="stats"></div>
@@ -402,21 +402,32 @@
                 };
 
 
-				const clear_actions_pane = () => {
+                const clear_actions_pane = () => {
                     document
                         .querySelector('#blockparty-wallet #actions .collapsible')
                         .innerHTML = '';
-				};
+                };
 
                 blockparty.before('login', () => clear_actions_pane());
                 blockparty.after('login', () => game.update_footer_counts());
                 blockparty.before('update_actions', () => clear_actions_pane());
 
-                blockparty.init({
-                    'bitdb_token': 'qp9rzh6levrrn5r5x4slc6q7qxhl452dty5nuyuq6m',
-                    'fee_per_kb': 1000,
-                });
+                const fork          = get_url_param('fork', 'abc');
+                const bitdb_url     = (fork == 'abc') ? 'https://bitdb.network/q/'
+                                                      : 'https://bitgraph.network/q/';
+                const bitsocket_url = (fork == 'abc') ? 'https://bitsocket.org/s/'
+                                                      : 'https://bitgraph.network/s/';
 
+                const rpc_url       = (fork == 'abc') ? 'https://cashexplorer.bitcoin.com'
+                                                      : 'https://cashexplorer.bitcoin.com'; // todo change me
+
+                blockparty.init({
+                    'bitdb_token':   'qp9rzh6levrrn5r5x4slc6q7qxhl452dty5nuyuq6m',
+                    'fee_per_kb':    1000,
+                    'rpc':           rpc_url,
+                    'bitdb_url':     bitdb_url,
+                    'bitsocket_url': bitsocket_url,
+                });
 
                 game = new Game(
                     get_url_param('world', '00000000')
@@ -427,6 +438,7 @@
                 );
                 game.init();
             });
+
             const show_help_modal = () => {
                 $('#help-modal').toggle();
                 if ($('#help-modal').is(':visible')) {

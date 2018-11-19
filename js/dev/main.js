@@ -195,7 +195,13 @@ class Game {
                 });
                 blockparty.update_actions();
             }, 2000);
-        }, false);
+        }, (err) => {
+            $('#loading-status').text('syncing failed :( try again');
+            console.log(err);
+            that.syncing = false;
+        }, {
+            safe: false
+        });
     }
 
     init_color_chooser() {
