@@ -130192,7 +130192,7 @@ const bchaddr    = require('bchaddrjs');
 const app = {};
 app.bch = bch;
 app.handlebars = Handlebars;
-app.revision = "d63ae44eabe8d04b58831082745d036b3f3c51fb\n";
+app.revision = "875ca77ff0c4e6f5fd75f8ad5f68460cb6250750\n";
 
 
 app.append_to   = 'body'; // which element to append the wallet to
@@ -130732,7 +130732,36 @@ app.send = (address, satoshis, callback) => {
     }
 
     let tx = new bch.Transaction();
-    tx.from(app.get_utxos());
+
+    const utxos = app.get_utxos().sort((a, b) => a.satoshis - b.satoshis);
+    let found = false;
+
+    // look for smallest utxo that could work
+    for (const utxo of utxos) {
+        if (utxo.satoshis-app.fee_per_kb >= satoshis) {
+            tx.from(utxo);
+            found = true;
+            break;
+        }
+    }
+
+    if (! found) {
+        let total = 0;
+        let required = satoshis+app.fee_per_kb;
+
+        utxos.sort((a, b) => b.satoshis - a.satoshis);
+
+        for (const utxo of utxos) {
+            total += utxo.satoshis;
+            required += 200;
+            tx = tx.from(utxo);
+
+            if (total >= required) {
+                break;
+            }
+        }
+    }
+
     tx.to(address, satoshis);
     tx.feePerKb(app.fee_per_kb);
     tx.change(app.get_address());
@@ -130744,6 +130773,8 @@ app.send = (address, satoshis, callback) => {
         if (callback) {
             callback(tx);
         }
+    }, (err) => {
+        console.error(err);
     });
 
     app.call_after('send', [address, satoshis, tx]);
