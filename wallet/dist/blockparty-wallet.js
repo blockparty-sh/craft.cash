@@ -130192,7 +130192,7 @@ const bchaddr    = require('bchaddrjs');
 const app = {};
 app.bch = bch;
 app.handlebars = Handlebars;
-app.revision = "5f68b6c0507c02eed994ebf0e9494c1e3e4a1b7b\n";
+app.revision = "d63ae44eabe8d04b58831082745d036b3f3c51fb\n";
 
 
 app.append_to   = 'body'; // which element to append the wallet to
@@ -130805,7 +130805,9 @@ app.broadcast_tx = (tx, callback, err_callback, options = {
     } else {
         app.insight.broadcast(tx_data, (err, res) => {
             if (err) {
-                err_callback(err);
+                if (err_callback) {
+                    err_callback(err);
+                }
             } else {
                 if (callback) {
                     callback(tx);
@@ -130817,14 +130819,14 @@ app.broadcast_tx = (tx, callback, err_callback, options = {
     }
 };
 
-app.update_balance = (callback, err_callback = (err) => {
-    console.error(err);
-}) => {
+app.update_balance = (callback, err_callback) => {
     app.call_before('update_balance', []);
 
     app.insight.address(app.get_legacy_address_str(), (err, addr_info) => {
         if (err) {
-            err_callback(err);
+            if (err_callback) {
+                err_callback(err);
+            }
         } else {
             localStorage.setItem('blockparty-wallet.balance',
                                  addr_info['balance']);
@@ -130844,14 +130846,14 @@ app.update_balance = (callback, err_callback = (err) => {
     });
 };
 
-app.update_utxos = (callback, err_callback = (err) => {
-    console.error(err);
-}) => {
+app.update_utxos = (callback, err_callback) => {
     app.call_before('update_utxos', []);
 
     app.insight.getUnspentUtxos(app.get_legacy_address_str(), (err, utxo_info) => {
         if (err) {
-            err_callback(err);
+            if (err_callback) {
+                err_callback(err);
+            }
         } else {
             const utxos = JSON.parse(JSON.stringify(utxo_info)).map((v) => ({
                 txId:        v['txid'],
