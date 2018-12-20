@@ -127816,12 +127816,16 @@ const sb         = require('satoshi-bitcoin');
 const app = {};
 app.bch = bch;
 app.handlebars = Handlebars;
+<<<<<<< HEAD
 app.revision = "546645079373ec3b0d91eef326c2179c8e036aeb\n";
+=======
+app.revision = "c46e3c4ae28a3c85a84389ca7ad6008a4806af39\n";
+>>>>>>> 5ae1bf1... switch bitdb to fountainhead
 
 
 app.append_to   = 'body'; // which element to append the wallet to
 app.bitdb_token = '';     // enter token from https://bitdb.network/v3/dashboard
-app.bitdb_url   = 'https://bitdb.network/q/';
+app.bitdb_url   = 'https://bitdb.fountainhead.cash/q/';
 app.bitsocket_url = 'https://bitsocket.org/s/';
 app.bitbox_url  = 'https://rest.bitbox.earth/v1/';
 
@@ -128578,20 +128582,17 @@ app.query_bitbox = (route, callback) => {
 };
 
 app.query_bitdb = (q, callback) => {
-    if (app.bitdb_token === '') {
-        window.alert('bitdb_token option not set');
-    }
-
     const b64 = btoa(JSON.stringify(q));
     const url = app.bitdb_url + b64;
 
-    const header = {
-        headers: {
+    const headers = {};
+    if (typeof app.bitdb_token !== 'undefined' && app.bitdb_token != '') {
+        headers.headers = {
             key: app.bitdb_token,
-        },
-    };
+        };
+    }
 
-    fetch(url, header)
+    fetch(url, headers)
         .then((r) => r.json())
         .then(callback);
 };

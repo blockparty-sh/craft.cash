@@ -112,7 +112,7 @@ Initializes the wallet and attaches it to the page.
 |--------|-------------|----------|------|--------|
 | bitdb_token | Grab this from https://bitdb.network/v3/dashboard | :heavy_check_mark: | string | |
 | append_to | Which element to append the wallet to | | string | body |
-| bitdb_url | Modify this if you are running custom bitdb instance.  | |string |  https://bitdb.network/q/ |
+| bitdb_url | Modify this if you are running custom bitdb instance.  | |string |  https://fountainhead.cash/q/ |
 | bitsocket_url | Modify this if you are running custom bitsocket instance.  | |string |  https://bitsocket.network/q/ |
 | bitbox_url | Modify this if you are running custom bitbox instance. | |string |  https://rest.bitbox.earth/v1/ |
 | fee_per_kb | Satoshis per kilobyte for fee. |  | integer |  1000 |
