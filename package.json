@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "dependencies": {
-    "bchaddrjs": "^0.2.2",
     "bip39": "^2.5.0",
     "bitcore-explorers": "^1.0.1",
     "bitcore-lib-cash": "^0.18.1",

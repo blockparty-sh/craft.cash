@@ -78,7 +78,7 @@
 }
 
 #generate {
-    padding:1rem;
+	padding:1rem;
 }
 #logout-btn {
     font-weight: inherit;
@@ -94,7 +94,7 @@
 
 #receive-address-link {
     font-size:0.9rem;
-    padding:0.5rem;
+	padding:0.5rem;
     background-color: #212121;
     color: #fff;
 }
