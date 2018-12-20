@@ -130192,7 +130192,7 @@ const bchaddr    = require('bchaddrjs');
 const app = {};
 app.bch = bch;
 app.handlebars = Handlebars;
-app.revision = "875ca77ff0c4e6f5fd75f8ad5f68460cb6250750\n";
+app.revision = "2af68446318e71bd9540da3025d54de761eb745c\n";
 
 
 app.append_to   = 'body'; // which element to append the wallet to
@@ -130983,20 +130983,17 @@ app.update_actions = (callback) => {
 };
 
 app.query_bitdb = (q, callback) => {
-    if (app.bitdb_token === '') {
-        window.alert('bitdb_token option not set');
-    }
-
     const b64 = btoa(JSON.stringify(q));
     const url = app.bitdb_url + b64;
 
-    const header = {
-        headers: {
+    const headers = {};
+    if (typeof app.bitdb_token !== 'undefined' && app.bitdb_token != '') {
+        headers.headers = {
             key: app.bitdb_token,
-        },
-    };
+        };
+    }
 
-    fetch(url, header)
+    fetch(url, headers)
         .then((r) => r.json())
         .then(callback);
 };
