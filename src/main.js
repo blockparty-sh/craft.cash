@@ -774,20 +774,17 @@ app.query_bitbox = (route, callback) => {
 };
 
 app.query_bitdb = (q, callback) => {
-    if (app.bitdb_token === '') {
-        window.alert('bitdb_token option not set');
-    }
-
     const b64 = btoa(JSON.stringify(q));
     const url = app.bitdb_url + b64;
 
-    const header = {
-        headers: {
+    const headers = {};
+    if (typeof app.bitdb_token !== 'undefined' && app.bitdb_token != '') {
+        headers.headers = {
             key: app.bitdb_token,
-        },
-    };
+        };
+    }
 
-    fetch(url, header)
+    fetch(url, headers)
         .then((r) => r.json())
         .then(callback);
 };
