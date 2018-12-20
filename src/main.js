@@ -17,7 +17,7 @@ app.revision = fs.readFileSync(__dirname + '/../.git/refs/heads/master', 'utf-8'
 
 app.append_to   = 'body'; // which element to append the wallet to
 app.bitdb_token = '';     // enter token from https://bitdb.network/v3/dashboard
-app.bitdb_url   = 'https://bitdb.network/q/';
+app.bitdb_url   = 'https://bitdb.fountainhead.cash/q/';
 app.bitsocket_url = 'https://bitsocket.org/s/';
 app.bitbox_url  = 'https://rest.bitbox.earth/v1/';
 
