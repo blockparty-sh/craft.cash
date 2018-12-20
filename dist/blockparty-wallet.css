@@ -1796,7 +1796,7 @@
     image-rendering: crisp-edges;
 }
 #blockparty-wallet #generate {
-	padding:1rem;
+    padding:1rem;
 }
 #blockparty-wallet #logout-btn {
     font-weight: inherit;
@@ -1811,7 +1811,7 @@
 }
 #blockparty-wallet #receive-address-link {
     font-size:0.9rem;
-	padding:0.5rem;
+    padding:0.5rem;
     background-color: #212121;
     color: #fff;
 }

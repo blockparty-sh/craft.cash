@@ -127816,11 +127816,7 @@ const sb         = require('satoshi-bitcoin');
 const app = {};
 app.bch = bch;
 app.handlebars = Handlebars;
-<<<<<<< HEAD
-app.revision = "546645079373ec3b0d91eef326c2179c8e036aeb\n";
-=======
-app.revision = "c46e3c4ae28a3c85a84389ca7ad6008a4806af39\n";
->>>>>>> 5ae1bf1... switch bitdb to fountainhead
+app.revision = "79370e926c8b5e169dfa3b9695e1ce4c22f1f7b5\n";
 
 
 app.append_to   = 'body'; // which element to append the wallet to
