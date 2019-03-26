@@ -178,9 +178,7 @@
             // we dont get any surprises... this after call will usually work if we place 
             // it after the init(), but we shouldn't assume it will. it wont.
             blockparty.after('login', get_current_name);
-            blockparty.init({
-                'bitdb_token': 'qp9rzh6levrrn5r5x4slc6q7qxhl452dty5nuyuq6m',
-            });
+            blockparty.init();
 
             // here we create the memo set_name transaction
             document.getElementById('new-name-btn').addEventListener('click', () => {

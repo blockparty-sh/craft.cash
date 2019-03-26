@@ -10,6 +10,7 @@ Please note that this project is in development, has not been battle tested, and
 
 - https://bitdb.network/
 - https://bitsocket.org/
+- https://bitbox.earth/
 - https://bitcore.io/
 - https://github.com/bitcoinjs/bip39
 - https://github.com/dawsbot/satoshi-bitcoin/
@@ -111,8 +112,9 @@ Initializes the wallet and attaches it to the page.
 |--------|-------------|----------|------|--------|
 | bitdb_token | Grab this from https://bitdb.network/v3/dashboard | :heavy_check_mark: | string | |
 | append_to | Which element to append the wallet to | | string | body |
-| bitdb_url | Modify this if you are running custom bitdb instance.  | |string |  https://bitdb.network/q/ |
+| bitdb_url | Modify this if you are running custom bitdb instance.  | |string |  https://fountainhead.cash/q/ |
 | bitsocket_url | Modify this if you are running custom bitsocket instance.  | |string |  https://bitsocket.network/q/ |
+| bitbox_url | Modify this if you are running custom bitbox instance. | |string |  https://rest.bitbox.earth/v1/ |
 | fee_per_kb | Satoshis per kilobyte for fee. |  | integer |  1000 |
 | transaction_received_pane_time | How long to show the received pane in milliseconds. |  | integer |  4800 |
 | transaction_sent_pane_time | How long to show the sent pane in milliseconds. |  | integer |  4800 |
@@ -158,15 +160,6 @@ Retrieves the string representation of the logged in address for bitdb queries. 
 ```js
 
 blockparty.get_address_suffix() == 'qz4xkn3wx9a04a6yvpkcz4lca5qdf0aslq50hy3v9g'
-```
-
-#### `blockparty.get_legacy_address_str() -> string`
-Retrieves the legacy string representation of the logged in address.
-
-##### Example
-```js
-
-blockparty.get_legacy_address_str() == '1DRbrkmvAsorWw41uDfxYjDRPi73RWo1GD'
 ```
 
 #### `blockparty.get_wif() -> string`
@@ -260,7 +253,7 @@ tx = blockparty.clean_tx_dust(tx);
 
 ```
 
-#### `blockparty.add_op_return_data(tx: bch.Transaction, data: [object]) -> bch.Transaction`
+#### `blockparty.add_op_return_data(tx: bch.Transaction, data: [object]) -> bch.Transaction
 
 Adds one or more `OP_RETURN` data points. If you use this, make sure that when you call `blockparty.broadcast_tx` you set safe to false as currently `bitcore-lib-cash` doesn't like the multiple `OP_RETURN` arguments. 
 
@@ -278,12 +271,8 @@ tx = blockparty.add_op_return_data(tx, [
 
 ```
 
-#### `blockparty.broadcast_tx(tx: bch.Transaction, callback: (tx) => {}, err_callback: (err) => {}, options: { safe: boolean = true, testing: boolean = false })`
-Sends a transaction off to the network. This uses the `blockparty.rpc` option to choose a server. It sends the serialized form of a transaction to a bitcoin node. A callback may be provided in order to perform additional processing after the broadcast has completed. `send` uses this internally to actually broadcast the transaction.
-
-The `safe` option is used to choose between safe serialization or just conversion to string. In case of using OP_RETURN you must disable safe mode, and therefore bitcore-lib-cash will not give an error on broadcast.
-
-The `testing` option is used to disable actually transmitting the transaction to the network. You can use this while developing your transaction functions to prevent unnecessary broadcasts.
+#### `blockparty.broadcast_tx(tx: bch.Transaction, callback: (tx) => {}, safe: boolean = true)`
+Sends a transaction off to the network. This uses the `blockparty.rpc` option to choose a server. It sends the serialized form of a transaction to a bitcoin node. A callback may be provided in order to perform additional processing after the broadcast has completed. `send` uses this internally to actually broadcast the transaction. The `safe` parameter is used to choose between safe serialization or just conversion to string. In case of using OP_RETURN you must disable safe mode, and therefore bitcore-lib-cash will not give an error on broadcast.
 
 ##### Example
 ```js
@@ -346,7 +335,7 @@ blockparty.after('login', (wif) => {
 });
 ```
 
-#### `blockparty.update_balance(callback: (data) => {}, err_callback: (err) => {})`
+#### `blockparty.update_balance(callback: (data) => {})`
 
 Retrieves the logged in addresses balance and updates localStorage, these values are set:
 
@@ -355,7 +344,7 @@ Retrieves the logged in addresses balance and updates localStorage, these values
 - `blockparty-wallet.total-sent`
 - `blockparty-wallet.total-received`
 
-And the callback receives the json from insight.
+And the callback receives the json from bitbox.
 
 ##### Example
 ```js
@@ -365,8 +354,8 @@ blockparty.update_balance((data) => {
 });
 ```
 
-#### `blockparty.update_utxos(callback: (data) => {}, err_callback: (err) => {})`
-Retrieves the utxo set for the logged in address. The callback contains the json from insight. 
+#### `blockparty.update_utxos(callback: (data) => {})`
+Retrieves the utxo set for the logged in address. The callback contains the json from bitbox. 
 
 ##### Example
 ```js
@@ -446,14 +435,6 @@ Gets the bch value of some satoshis like 13370000. Use this because Javascripts 
 #### `blockparty.bch2sat(bch: string) -> integer`
 
 Gets the satoshis of a bch amount like 0.1337. Use this because Javascripts number handling will introduce small errors otherwise.
-
-#### `blockparty.to_legacy_address(addr: string) -> string`
-
-Converts a Bitcoin address to its legacy representation.
-
-#### `blockparty.to_cash_address(addr: string) -> string`
-
-Converts a Bitcoin address to its cash representation.
 
 #### `blockparty.hide()`
 
