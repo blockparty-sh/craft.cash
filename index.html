@@ -60,9 +60,7 @@
         <script src="js/postprocessing/TexturePass.js"></script>
         <script src="js/postprocessing/UnrealBloomPass.js"></script>
 
-        <script src="https://www.moneybutton.com/moneybutton.js"></script>
-
-        <link rel="stylesheet" href="wallet/dist/blockparty-wallet.css">
+        <link rel="stylesheet" href="wallet/dist/blockparty-wallet.css?cachebuster=1477">
 
         <style>
         html, body {
@@ -139,9 +137,6 @@
             font-size:6vw;
             text-align:center;
             padding:2vw;
-            font-family:'Kodchasan', -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-            box-shadow:0px 0px 10px rgba(0, 0, 50, 0.1);
-            text-shadow: 2px 2px rgba(0, 0, 0, 0.5);
         }
 
         #footer {
@@ -153,8 +148,7 @@
             color: #fff;
             background-color: #363636;
             padding:0.4rem;
-            box-shadow:0px 0px 2px 0px #040404;
-            text-shadow: 2px 2px rgba(0, 0, 0, 0.5);
+            box-shadow:0px 0px 2px 0px #040404
         }
 
         #footer a {
@@ -232,10 +226,6 @@
             z-index:100;
             text-align:left;
         }
-        #money-button-container {
-            width: auto;
-            margin:0 auto;
-        }
 
         </style>
     </head>
@@ -255,7 +245,6 @@
         </div>
         <div id="help-modal">
             <h1>craft.cash (WIP)</h1>
-            <h2>switch to <a id="fork-link" href="">SV fork</a></h2>
             <p>
             craft.cash is a voxel drawing program implemented on the bitcoin cash blockchain.<br>
             it is powered by the <a href="https://blockparty.sh" target="_blank">blockparty wallet</a>.<br>
@@ -276,19 +265,6 @@
             h to show this help pane<br>
             H to toggle showing instructions in corner<br>
             </p>
-            <br>
-            <div id="money-button-container">
-                <div class="money-button"
-                  data-to="1153"
-                  data-amount="0.01"
-                  data-currency="BCH"
-                  data-label="Donate"
-                  data-client-identifier="06c05983a28077c6c0f2ae4b434c63c7"
-                  data-button-id="1541885166838"
-                  data-button-data="{}"
-                  data-type="tip"
-                ></div>
-            </div>
         </div>
         <div style="position: relative; z-index: 1; " id="container"></div> 
         <div style="position: absolute; z-index: 100;" id="stats"></div>
@@ -316,9 +292,9 @@
                 </div>
             </li>
         </script>
-        <script src="wallet/dist/blockparty-wallet.js"></script>
-        <script src="js/dev/world.js"></script>
-        <script src="js/dev/main.js"></script>
+        <script src="wallet/dist/blockparty-wallet.js?cachebuster=1350"></script>
+        <script src="js/dev/world.js?cachebuster=1339"></script>
+        <script src="js/dev/main.js?cachebuster=1345"></script>
         <script>
         // device detection
             if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent) 
@@ -407,38 +383,20 @@
                 };
 
 
-                const clear_actions_pane = () => {
+				const clear_actions_pane = () => {
                     document
                         .querySelector('#blockparty-wallet #actions .collapsible')
                         .innerHTML = '';
-                };
+				};
 
                 blockparty.before('login', () => clear_actions_pane());
                 blockparty.after('login', () => game.update_footer_counts());
                 blockparty.before('update_actions', () => clear_actions_pane());
 
-                const fork          = get_url_param('fork', 'abc');
-                $('#fork-link').attr('href', '/?fork=' + ((fork == 'abc') ? 'sv' : 'abc'));
-                $('#fork-link').text((fork == 'abc') ? 'SV fork' : 'ABC fork');
-                if (fork != 'sv') {
-                    $('#money-button-container').hide();
-                }
-
-                const bitdb_url     = (fork == 'abc') ? 'https://bitdb.network/q/'
-                                                      : 'https://bitgraph.network/q/';
-                const bitsocket_url = (fork == 'abc') ? 'https://bitsocket.org/s/'
-                                                      : 'https://bitgraph.network/s/';
-
-                const rpc_url       = (fork == 'abc') ? 'https://cashexplorer.bitcoin.com'
-                                                      : 'https://cashexplorer.bitcoin.com'; // todo change me
-
                 blockparty.init({
-                    'bitdb_token':   'qp9rzh6levrrn5r5x4slc6q7qxhl452dty5nuyuq6m',
-                    'fee_per_kb':    1000,
-                    'rpc':           rpc_url,
-                    'bitdb_url':     bitdb_url,
-                    'bitsocket_url': bitsocket_url,
+                    'fee_per_kb': 1000
                 });
+
 
                 game = new Game(
                     get_url_param('world', '00000000')
@@ -449,7 +407,6 @@
                 );
                 game.init();
             });
-
             const show_help_modal = () => {
                 $('#help-modal').toggle();
                 if ($('#help-modal').is(':visible')) {

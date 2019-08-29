@@ -43,7 +43,7 @@ class Game {
         this.aspect = this.screenWidth/this.screenHeight;
         this.near = 0.01;
         this.far = 200;
-        this.use_shaders = true;
+        this.use_shaders = false;
 
         // Object arrays
         this.world = undefined;
@@ -154,7 +154,7 @@ class Game {
                 } else if (utxo.satoshis > blockparty.fee_per_kb) {
                     console.log('found big one');
                     tx.from(utxo);
-                    for (let i=0; i<utxo.satoshis - Math.ceil(utxo.satoshis / blockparty.fee_per_kb * 260) - (blockparty.fee_per_kb*2); i += blockparty.fee_per_kb) {
+                    for (let i=0, j=0; i<utxo.satoshis - Math.ceil(utxo.satoshis / blockparty.fee_per_kb * 260) - (blockparty.fee_per_kb*2) && j<100; i += blockparty.fee_per_kb, ++j) {
                         console.log('added output');
                         tx.to(blockparty.get_address(), blockparty.fee_per_kb);
                     }
@@ -195,13 +195,7 @@ class Game {
                 });
                 blockparty.update_actions();
             }, 2000);
-        }, (err) => {
-            $('#loading-status').text('syncing failed :( try again');
-            console.log(err);
-            that.syncing = false;
-        }, {
-            safe: false
-        });
+        }, false);
     }
 
     init_color_chooser() {
@@ -412,7 +406,7 @@ class Game {
         hemiLight.position.set(0, 500, 0);
         this.scene.add(hemiLight);
 
-        let dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+        let dirLight = new THREE.DirectionalLight(0xffffff, 1);
         dirLight.color.setHSL(0.1, 1, 0.95);
         dirLight.position.set(10, 100.75, 10);
         dirLight.position.multiplyScalar(10);
@@ -458,7 +452,7 @@ class Game {
     init_renderer() {
         this.renderer = new THREE.WebGLRenderer({antialias: false});
         this.renderer.setSize(this.screenWidth, this.screenHeight);
-        this.renderer.shadowMap.enabled = false;
+        this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.renderer.setClearColor(0x333333, 1);
     }
