@@ -7,7 +7,7 @@
     "bitcore-explorers": "^1.0.1",
     "bitcore-lib-cash": "^0.18.1",
     "brfs": "^2.0.1",
-    "handlebars": "^4.0.12",
+    "handlebars": "^4.7.7",
     "materialize-css": "^1.0.0",
     "qrcode-generator": "^1.4.1",
     "satoshi-bitcoin": "^1.0.4",
